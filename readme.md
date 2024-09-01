@@ -3,7 +3,8 @@
 
 - [drive](https://drive.google.com/drive/folders/1FLuEEXDTOg4YhkYT3M8GFzDY0F9UuOwb): plantillas y entregas
 - [excalidraw](https://excalidraw.com/#room=d09e1181ba48f077258c,0zNHoBR1Pr9vPYAQqW1FMg): mockup
-- [repo](https://github.com/danielazim13/genespeluqueria): versionado
+- [repo](https://github.com/danielazim13/genespeluqueria)
+- [live](https://genespeluqueria-44526.web.app/)
 - [github projects](https://github.com/users/danielazim13/projects/1): kanban
 - [firebase](https://console.firebase.google.com/u/0/project/genespeluqueria-44526/overview): backend
 - links utiles
@@ -28,6 +29,7 @@
 - [ ] turno
     - [ ] pedir turno (cliente)
     - [ ] ver agenda (lista de turnos) (admin)
+- [ ] documentar
 
 ## como hacer una cuenta administrador
 

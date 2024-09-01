@@ -1,1 +1,36 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"genespeluqueria-44526","appId":"1:475400744672:android:de57ef723c3adb78b6ea85","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"genespeluqueria-44526","configurations":{"android":"1:475400744672:android:de57ef723c3adb78b6ea85","ios":"1:475400744672:ios:15fd74f7bf637453b6ea85","macos":"1:475400744672:ios:15fd74f7bf637453b6ea85","web":"1:475400744672:web:b55e201aecdeabb3b6ea85","windows":"1:475400744672:web:c310be9146fa0c20b6ea85"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "genespeluqueria-44526",
+          "appId": "1:475400744672:android:de57ef723c3adb78b6ea85",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "genespeluqueria-44526",
+          "configurations": {
+            "android": "1:475400744672:android:de57ef723c3adb78b6ea85",
+            "ios": "1:475400744672:ios:15fd74f7bf637453b6ea85",
+            "macos": "1:475400744672:ios:15fd74f7bf637453b6ea85",
+            "web": "1:475400744672:web:b55e201aecdeabb3b6ea85",
+            "windows": "1:475400744672:web:c310be9146fa0c20b6ea85"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
+  }
+}

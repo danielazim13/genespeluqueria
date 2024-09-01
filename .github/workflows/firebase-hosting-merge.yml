@@ -3,9 +3,14 @@
 
 name: Deploy to Firebase Hosting on merge
 on:
-  push:
-    branches:
-      - main
+  # Temporarily disable this workflow
+  # push:
+  #   branches:
+  #     - main
+
+  # The workflow will only run manually now
+  workflow_dispatch:
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest

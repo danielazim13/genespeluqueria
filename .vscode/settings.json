@@ -28,7 +28,7 @@
     "functions/package-lock.json": true,
     // ...
     ".firebase": true,
-    ".github": true,
+    ".github": false,
     "public": true,
     ".gitignore": false,
     // wip

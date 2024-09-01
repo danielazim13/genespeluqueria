@@ -1,0 +1,42 @@
+{
+  "files.exclude": {
+    // root directories
+    ".dart_tool": true,
+    ".idea": true,
+    "android": true,
+    "build": true,
+    "ios": true,
+    "linux": true,
+    "macos": true,
+    "web": true,
+    "windows": true,
+    // root files
+    ".firebaserc": true,
+    ".flutter-plugins": true,
+    ".flutter-plugins-dependencies": true,
+    ".metadata": true,
+    "analysis_options.yaml": true,
+    "app.iml": true,
+    "firebase.json": true,
+    "pubspec.lock": true,
+    "firebase-debug.log": true,
+    "firestore.indexes.json": true,
+    "firestore.rules": true,
+    // firebase functions
+    "functions/node_modules": true,
+    "functions/.gitignore": true,
+    "functions/package-lock.json": true,
+    // ...
+    ".firebase": true,
+    ".github": true,
+    "public": true,
+    ".gitignore": true,
+    // wip
+    //"lib/main-og.dart": true,
+    //"lib/assets": true,
+    //"lib/core": true,
+    //"lib/routes": true,
+    //"lib/screens": true,
+    //"lib/theme": true
+  }
+}

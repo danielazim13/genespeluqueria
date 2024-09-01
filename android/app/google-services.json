@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "475400744672",
+    "project_id": "genespeluqueria-44526",
+    "storage_bucket": "genespeluqueria-44526.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475400744672:android:de57ef723c3adb78b6ea85",
+        "android_client_info": {
+          "package_name": "com.example.aplicacion_taller"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBa1Av2oLz02I3sa2sj4X66vUT38PDe65w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -18,7 +18,7 @@ class Usuario {
       id: doc.id,
       nombre: data['nombre'] ?? '',
       telefono: data['telefono'] ?? '',
-      esAdmin: false,
+      esAdmin: data['esAdmin'] ?? false,
     );
   }
 }

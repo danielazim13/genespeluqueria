@@ -1,10 +1,11 @@
+import 'package:app/screens/usuario/edit_screen.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:aplicacion_taller/screens/auth/login_screen.dart';
-import 'package:aplicacion_taller/screens/auth/register_screen.dart';
+import 'package:app/screens/usuario/login_screen.dart';
+import 'package:app/screens/usuario/register_screen.dart';
 
-import 'package:aplicacion_taller/screens/admin/home_screen.dart';
-import 'package:aplicacion_taller/screens/cliente/home_screen.dart';
+import 'package:app/screens/admin_screen.dart';
+import 'package:app/screens/cliente_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -23,11 +24,15 @@ final accountRoutes = [
     path: '/register',
     builder: (context, state) => const RegisterScreen(),
   ),
+  GoRoute(
+    path: '/editar',
+    builder: (context, state) => const EditUserScreen(),
+  ),
 ];
 
 final adminRoutes = [
   GoRoute(
-    path: '/administrador',
+    path: '/admin',
     builder: (context, state) => const AdminHomeScreen(),
   ),
 ];

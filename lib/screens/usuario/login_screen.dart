@@ -1,3 +1,5 @@
+import 'package:app/entities/usuario.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -16,8 +18,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Instancia de FirebaseAuth para manejar la autenticación
+  // Instancia de FirebaseAuth y FirebaseStore
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   // Variable para almacenar mensajes de error
   String _errorMessage = '';
@@ -58,17 +61,39 @@ class _LoginScreenState extends State<LoginScreen> {
 
   /// Autentica al usuario usando Firebase y redirige según el tipo de usuario
   Future<void> _authenticateUser() async {
+    // Autenticar con Firebase Auth
     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
       email: _emailController.text,
       password: _passwordController.text,
     );
 
     final user = userCredential.user;
-    // Redirige a diferentes rutas basado en el email del usuario
-    if (user != null && user.email == 'admin@example.com') {
-      context.go('/administrador');
+    if (user != null) {
+      // Buscar datos adicionales del usuario en Firestore
+      try {
+        DocumentSnapshot userDoc =
+            await _firestore.collection('usuarios').doc(user.uid).get();
+
+        if (userDoc.exists) {
+          Usuario usuario = Usuario.fromFirestore(userDoc);
+
+          // Redirigir basado en el campo esAdmin
+          if (usuario.esAdmin) {
+            context.go('/admin');
+          } else {
+            context.go('/cliente');
+          }
+        } else {
+          // Si el documento del usuario no existe en Firestore
+          _setErrorMessage('Error: Datos de usuario no encontrados');
+        }
+      } catch (e) {
+        // Error al obtener datos de Firestore
+        _setErrorMessage('Error al obtener datos de usuario: $e');
+      }
     } else {
-      context.go('/cliente');
+      // Si la autenticación fue exitosa pero user es null (caso poco probable)
+      _setErrorMessage('Error de autenticación');
     }
   }
 
@@ -86,12 +111,14 @@ class _LoginScreenState extends State<LoginScreen> {
           _errorMessage = 'Email inválido';
           break;
         default:
-            if (e.message != null && e.message!.contains('The supplied auth credential is incorrect, malformed or has expired')) {
-              _errorMessage = 'Credenciales incorrectas o mal formadas';
-            } else {
-              _errorMessage = 'Ocurrio un error: ${e.message}';
-            }
-            break;
+          if (e.message != null &&
+              e.message!.contains(
+                  'The supplied auth credential is incorrect, malformed or has expired')) {
+            _errorMessage = 'Credenciales incorrectas o mal formadas';
+          } else {
+            _errorMessage = 'Ocurrio un error: ${e.message}';
+          }
+          break;
       }
     });
   }

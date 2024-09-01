@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'package:aplicacion_taller/core/firebase_options.dart';
-import 'package:aplicacion_taller/core/router.dart';
+import 'package:app/core/firebase_options.dart';
+import 'package:app/core/router.dart';
 
 
 void main() async {

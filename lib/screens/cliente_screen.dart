@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:aplicacion_taller/widgets/home_screen_base.dart';
-import 'package:aplicacion_taller/widgets/navigation_button.dart';
+import 'package:app/widgets/home_screen_base.dart';
+import 'package:app/widgets/navigation_button.dart';
 
 class ClienteHomeScreen extends StatelessWidget {
   const ClienteHomeScreen({super.key});

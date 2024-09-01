@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:aplicacion_taller/widgets/navigation_button.dart';
+import 'package:app/widgets/navigation_button.dart';
 
 class HomeScreenBase extends StatelessWidget {
   final String title;
@@ -37,7 +37,7 @@ class HomeScreenBase extends StatelessWidget {
             ),
              iconSize: 42,
             onPressed: () {
-              context.push('/cliente/editar/perfil/');
+              context.push('/editar');
               // Acción del botón de usuario
             }),
         IconButton(

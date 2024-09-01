@@ -15,20 +15,26 @@
 ![](assets/240901_015514.jpg)
 
 ## para terminar el mpv falta lo siguiente
-- [ ] config
-    - [x] instala y configura dependencias (firebase, riverpod, go_router, etc)
-    - [x] configura firebase auth y store
-    - [ ] website deployment
-    - [ ] riverpod: theme
-    - [ ] riverpod: `/register` wizard
-- [ ] usuario
-    - [x] login
-    - [x] registro
-    - [x] home cliente
-    - [x] home administrador
 - [ ] turno
     - [ ] pedir turno (cliente)
     - [ ] ver agenda (lista de turnos) (admin)
+- [ ] config
+    - [x] instala y configura dependencias (firebase, riverpod, go_router, etc)
+    - [x] configura firebase auth y store
+    - [ ] website deployment: fix ci
+- [x] usuario
+    - [x] login
+    - [x] registro
+    - [x] edit
+- [x] menus
+    - [x] cliente
+    - [x] administrador
+- [ ] chiches
+    - [ ] theme
+    - [ ] riverpod: theme switch
+    - [ ] riverpod: `/register` wizard
+    - [ ] firebase storage: foto de perfil
+    - [ ] firebase functions: algo para probar
 - [ ] documentar
 
 ## como hacer una cuenta administrador
@@ -38,6 +44,18 @@ cambialo desde cloudstore
 ![](assets/240901_013651.jpg)
 
 ## screenshots
+
+<table>
+  <tr>
+    <td><img src="assets/240901_034215_login.jpg" alt="Login Screen" width="400"/></td>
+    <td><img src="assets/240901_034227_registro.jpg" alt="Registration Screen" width="400"/></td>
+  </tr>
+  <tr>
+    <td><img src="assets/240901_034256_menu_admin.jpg" alt="Admin Menu" width="400"/></td>
+    <td><img src="assets/240901_034432_menu_cliente.jpg" alt="Client Menu" width="400"/></td>
+  </tr>
+</table>
+
 
 ## log
 - 2024-09-01:

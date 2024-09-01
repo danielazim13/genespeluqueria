@@ -9,22 +9,12 @@ class ClienteHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: HomeScreenBase(
-        title: 'AutoFixer',
+        title: 'Cliente',
         buttons: [
           NavigationButton(
             text: 'Solicitar turno',
-            route: '/cliente/turns/create/refactor',
+            route: '/cliente/turno/pedir',
             icon: Icon(Icons.calendar_month, size: 90, color: Colors.black),
-          ),
-          NavigationButton(
-            text: 'Mis reparaciones',
-            route: '/cliente/reparations',
-            icon: Icon(Icons.build, size: 90, color: Colors.black),
-          ),
-          NavigationButton(
-            text: 'Mis vehiculos',
-            route: '/cliente/vehiculo/list',
-            icon: Icon(Icons.car_rental, size: 90, color: Colors.black),
           ),
         ],
       ),

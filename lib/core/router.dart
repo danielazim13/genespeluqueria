@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 
-import 'package:aplicacion_taller/screens/login_screen.dart';
-import 'package:aplicacion_taller/screens/register_screen.dart';
+import 'package:aplicacion_taller/screens/auth/login_screen.dart';
+import 'package:aplicacion_taller/screens/auth/register_screen.dart';
 
 import 'package:aplicacion_taller/screens/admin/home_screen.dart';
 import 'package:aplicacion_taller/screens/cliente/home_screen.dart';

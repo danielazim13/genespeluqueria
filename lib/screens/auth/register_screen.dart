@@ -88,16 +88,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       final user = userCredential.user;
       if (user != null) {
-        await _firestore.collection('users').doc(user.uid).set({
-          'name': _nameController.text,
-          'phone': _phoneController.text,
+        await _firestore.collection('usuarios').doc(user.uid).set({
+          'nombre': _nameController.text,
+          'telefono': _phoneController.text,
           'email': _emailController.text,
+          'esAdmin': false,
         });
-        if (user.email == 'admin@example.com') {
-          context.go('/administrador');
-        } else {
-          context.go('/cliente');
-        }
+
+        context.go('/cliente');
       }
     } on FirebaseAuthException catch (e) {
       setState(() {

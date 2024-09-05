@@ -6,6 +6,7 @@ import 'package:app/screens/usuario/register_screen.dart';
 
 import 'package:app/screens/admin_screen.dart';
 import 'package:app/screens/cliente_screen.dart';
+import 'package:app/screens/pedir_turno_screen.dart';
 
 final GoRouter appRouter = GoRouter(
   routes: [
@@ -41,5 +42,9 @@ final clienteRoutes = [
   GoRoute(
     path: '/cliente',
     builder: (context, state) => const ClienteHomeScreen(),
+  ),
+  GoRoute(
+    path: '/cliente/turno/pedir',
+    builder: (context, state) => const SolicitarTurnoScreen(),
   ),
 ];

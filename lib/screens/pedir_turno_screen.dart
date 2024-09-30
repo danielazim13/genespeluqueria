@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/entities/servicio.dart';
 import 'package:app/entities/turno.dart';
 import 'package:app/entities/usuario.dart';
@@ -8,8 +8,7 @@ import 'package:app/entities/usuario.dart';
 class SolicitarTurnoScreen extends StatefulWidget {
   final Usuario currentUser;
 
-  const SolicitarTurnoScreen({Key? key, required this.currentUser})
-      : super(key: key);
+  const SolicitarTurnoScreen({super.key, required this.currentUser});
 
   @override
   _SolicitarTurnoScreenState createState() => _SolicitarTurnoScreenState();
@@ -151,7 +150,7 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
               Text(selectedTime.format(context)),
               SizedBox(height: 16),
               Text('Seleccionar servicios',
-                  style: Theme.of(context).textTheme.subtitle1),
+                  style: Theme.of(context).textTheme.titleMedium),
               ...services.map((service) => CheckboxListTile(
                     title: Text(service.nombre),
                     subtitle: Text('\$${service.precio.toStringAsFixed(2)}'),
@@ -165,17 +164,17 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
                   )),
               SizedBox(height: 16),
               Text('Total: \$${total.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.headline6),
+                  style: Theme.of(context).textTheme.titleLarge),
               SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  child: Text('Solicitar'),
                   onPressed: _solicitarTurno,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
+                  child: Text('Solicitar'),
                 ),
               ),
             ],

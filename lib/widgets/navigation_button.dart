@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 class NavigationButton extends StatelessWidget {
   final String text;
   final String route;
-  final Icon icon;
+  final IconData icon;
 
   const NavigationButton({
     super.key,
@@ -15,23 +15,11 @@ class NavigationButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () =>  context.push(route),
-      child: Card(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              icon,
-              const SizedBox(height: 10),
-              Text(
-                text,
-                style: const TextStyle(fontSize: 32, color: Colors.black), // Aumenta el tamaño del texto
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return Card(
+        child: ListTile(
+            // trailing: const Icon(Icons.arrow_forward_ios),
+            leading: Icon(icon, size: 32),
+            title: Text(text, style: const TextStyle(fontSize: 16)),
+            onTap: () => context.push(route)));
   }
 }

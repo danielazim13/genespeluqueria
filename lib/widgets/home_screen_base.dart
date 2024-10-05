@@ -21,48 +21,42 @@ class HomeScreenBase extends StatelessWidget {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-     title: Text(
-        title,
-        textAlign: TextAlign.center, // Centra el texto horizontalmente
-        style: const TextStyle(
-          fontSize: 24, // Tamaño de la fuente más grande
-          fontWeight: FontWeight.bold, // Texto en negrita
-        ),
-      ),
       automaticallyImplyLeading: true,
+      // izquierda
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.home, size: 36),
+          SizedBox(width: 8),
+          Text(title),
+        ],
+      ),
+      // derecha
       actions: [
         IconButton(
-            icon: const Icon(
-              Icons.person,
-            ),
-             iconSize: 42,
-            onPressed: () {
-              context.push('/editar');
-              // Acción del botón de usuario
-            }),
+          icon: const Icon(Icons.person),
+          iconSize: 36,
+          onPressed: () {
+            context.push('/editar');
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.logout),
-           iconSize: 42,
+          iconSize: 36,
           onPressed: () => _logout(context),
         )
       ],
     );
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         child: Column(
           children: buttons.map((button) {
-            return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SizedBox(
-                height: 220, // Altura fija para cada botón
-                child: button,
-              ),
-            );
+            return button;
           }).toList(),
         ),
       ),

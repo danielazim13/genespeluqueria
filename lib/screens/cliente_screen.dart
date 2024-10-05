@@ -9,12 +9,12 @@ class ClienteHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: HomeScreenBase(
-        title: 'Cliente',
+        title: 'Home (Cliente)',
         buttons: [
           NavigationButton(
             text: 'Solicitar turno',
             route: '/cliente/turno/pedir',
-            icon: Icon(Icons.calendar_month, size: 90, color: Colors.black),
+            icon: Icons.calendar_month,
           ),
         ],
       ),

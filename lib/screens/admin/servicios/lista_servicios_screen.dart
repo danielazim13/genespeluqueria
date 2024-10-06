@@ -91,7 +91,7 @@ class ListaServiciosScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.push('/administrador/add-servicio');
+          context.push('/admin/servicios/agregar');
         },
         child: const Icon(Icons.add),
       ),

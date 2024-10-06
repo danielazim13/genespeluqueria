@@ -28,7 +28,7 @@ class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
     if (_formKey.currentState!.validate()) {
       // Obtener la referencia del nuevo documento en la colección "services"
       DocumentReference docRef = FirebaseFirestore.instance
-          .collection('services')
+          .collection('servicios')
           .doc();
 
       // Crear una instancia de Service con el ID generado por Firebase

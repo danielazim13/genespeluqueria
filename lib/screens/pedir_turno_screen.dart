@@ -17,7 +17,7 @@ class SolicitarTurnoScreen extends StatefulWidget {
 class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
-  List<Service> services = [];
+  List<Servicio> services = [];
   Map<String, bool> selectedServices = {};
   double total = 0;
 
@@ -31,9 +31,9 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
     // Simulate loading services from Firestore
     // In a real app, you'd fetch this from Firestore
     services = [
-      Service(id: '1', nombre: 'Peinado', precio: 500, duracion: 30),
-      Service(id: '2', nombre: 'Tintura', precio: 1500, duracion: 60),
-      Service(id: '3', nombre: 'Extensiones', precio: 5000, duracion: 120),
+      Servicio(id: '1', nombre: 'Peinado', precio: 500, duracion: 30),
+      Servicio(id: '2', nombre: 'Tintura', precio: 1500, duracion: 60),
+      Servicio(id: '3', nombre: 'Extensiones', precio: 5000, duracion: 120),
     ];
     setState(() {
       for (var service in services) {

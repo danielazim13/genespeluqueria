@@ -14,6 +14,10 @@ import 'package:app/screens/admin/servicios/agregar_servicio_screen.dart';
 import 'package:app/screens/admin/servicios/detalle_servicio_screen.dart';
 import 'package:app/screens/admin/servicios/editar_servicio_screen.dart';
 
+// Administrador > Turnos
+import 'package:app/screens/admin/turnos/turnos_details_screen.dart';
+import 'package:app/screens/admin/turnos/turnos_list_screen.dart';
+
 // Cliente
 import 'package:app/screens/cliente_screen.dart';
 
@@ -63,6 +67,15 @@ final adminRoutes = [
     path: '/admin/servicios/editar',
     builder: (context, state) =>
         EditarServicioScreen(servicio: state.extra as Servicio),
+  ),
+    // Turnos
+  GoRoute(
+    path: '/admin/turnos/lista',
+    builder: (context, state) => const ListaTurnosScreen(),
+  ),
+  GoRoute(
+    path: '/admin/turnos/detalles',
+    builder: (context, state) => const ListaDetallesScreen(),
   ),
 ];
 

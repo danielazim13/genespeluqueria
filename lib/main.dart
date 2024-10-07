@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-
-import 'package:app/core/firebase_options.dart';
-import 'package:app/core/router.dart';
+import 'core/firebase_options.dart';
+import 'core/router.dart';
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});

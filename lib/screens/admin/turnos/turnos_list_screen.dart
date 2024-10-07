@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app/entities/turn.dart';
+import 'package:app/entities/turno.dart';
 import 'package:app/widgets/turn_item.dart';
 import 'package:intl/intl.dart'; // Para formatear fechas
 
@@ -39,7 +39,7 @@ class _TurnosListScreenState extends State<TurnosListScreen> {
     startDate = DateTime.now();
     endDate = DateTime.now().add(Duration(days: 7));
     egresoStartDate = DateTime.now();
-    egresoEndDate = DateTime.now().add(Duration(days: 14));
+    /*egresoEndDate = DateTime.now().add(Duration(days: 14));*/
     _fetchTurns();
   }
 
@@ -77,7 +77,7 @@ class _TurnosListScreenState extends State<TurnosListScreen> {
   Widget build(BuildContext context) {
     List<Turn> filteredTurns = selectedState != null &&
             selectedState!.value != 'Todos'
-        ? allTurns.where((turn) => turn.state == selectedState!.value).toList()
+        ? allTurns.where((turn) => turn.estado == selectedState!.value).toList()
         : allTurns;
 
     filteredTurns = _filterByDate(filteredTurns);
@@ -145,7 +145,7 @@ class _TurnosListScreenState extends State<TurnosListScreen> {
                             firstDate: DateTime(2000),
                             lastDate: DateTime(2101),
                           );
-                          if (picked != null && picked != startDate) {
+                          if (picked != startDate) {
                             setState(() {
                               startDate = picked;
                             });

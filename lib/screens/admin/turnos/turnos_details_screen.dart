@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:app/entities/turn.dart';
+import 'package:app/entities/turno.dart';
 
 class TurnoDetailsScreen extends StatefulWidget {
   final Turn turn;
@@ -29,7 +29,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
   void initState() {
     super.initState();
     _selectedState =
-        _states.contains(widget.turn.state) ? widget.turn.state : _states[0];
+        _states.contains(widget.turn.estado) ? widget.turn.estado: _states[0];
     _fetchTurnDetails();
     _fetchUserDetails();
   }
@@ -38,7 +38,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('turnos')
-          .doc(widget.turn.userId)
+          .doc(widget.turn.usuarioId)
           .get();
       if (snapshot.exists) {
         setState(() {
@@ -54,7 +54,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('users')
-          .doc(widget.turn.userId)
+          .doc(widget.turn.usuarioId)
           .get();
       if (snapshot.exists) {
         setState(() {
@@ -146,8 +146,8 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    if (widget.turn.message.isNotEmpty)
-                      _buildDetailRow('Comentarios', widget.turn.message),
+                    if (widget.turn.mensaje.isNotEmpty)
+                      _buildDetailRow('Comentarios', widget.turn.mensaje),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: _updateTurnState,

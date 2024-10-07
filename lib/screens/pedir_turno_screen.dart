@@ -6,9 +6,9 @@ import 'package:app/entities/turno.dart';
 import 'package:app/entities/usuario.dart';
 
 class SolicitarTurnoScreen extends StatefulWidget {
-  final Usuario currentUser;
+  final Usuario? currentUser;
 
-  const SolicitarTurnoScreen({super.key, required this.currentUser});
+  const SolicitarTurnoScreen({super.key, this.currentUser});
 
   @override
   _SolicitarTurnoScreenState createState() => _SolicitarTurnoScreenState();
@@ -84,7 +84,7 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
         .toList();
 
     final turno = Turn(
-      usuarioId: widget.currentUser.id,
+      usuarioId: widget.currentUser!.id,
       servicios: selectedServiceIds,
       ingreso: DateTime(
         selectedDate.year,
@@ -95,8 +95,8 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
       ),
       estado: 'Pendiente',
       precio: total,
-      egreso:
-          DateTime.now(), // This should be calculated based on service duration
+      /*egreso:
+          DateTime.now(),*/ // This should be calculated based on service duration
       mensaje: '',
     );
 

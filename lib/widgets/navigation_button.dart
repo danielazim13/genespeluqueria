@@ -10,7 +10,7 @@ class NavigationButton extends StatelessWidget {
     super.key,
     required this.text,
     required this.route,
-    required this.icon,
+    required this.icon, required Null Function() onTap,
   });
 
   @override

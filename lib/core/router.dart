@@ -1,10 +1,12 @@
 import 'package:app/entities/servicio.dart';
+import 'package:app/entities/usuario.dart';
 import 'package:app/screens/usuario/edit_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Usuario
 import 'package:app/screens/usuario/login_screen.dart';
 import 'package:app/screens/usuario/register_screen.dart';
+import 'package:app/screens/pedir_turno_screen.dart';
 
 // Administrador
 import 'package:app/screens/admin/home_screen.dart';
@@ -69,19 +71,27 @@ final adminRoutes = [
         EditarServicioScreen(servicio: state.extra as Servicio),
   ),
     // Turnos
-  GoRoute(
+
+  /*GoRoute(
     path: '/admin/turnos/lista',
     builder: (context, state) => const ListaTurnosScreen(),
   ),
   GoRoute(
     path: '/admin/turnos/detalles',
     builder: (context, state) => const ListaDetallesScreen(),
-  ),
+  ),*/
 ];
 
 final clienteRoutes = [
   GoRoute(
     path: '/cliente',
     builder: (context, state) => const ClienteHomeScreen(),
-  )
+  ),
+GoRoute(
+  path: '/cliente/turno/pedir',
+  builder: (context, state) {
+    final Usuario? currentUser = state.extra as Usuario?; 
+    return SolicitarTurnoScreen(currentUser: currentUser);
+  },
+),
 ];

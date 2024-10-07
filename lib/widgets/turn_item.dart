@@ -1,5 +1,5 @@
-import 'package:app/entities/turn.dart';
-import 'package:app/entities/user.dart';
+import 'package:app/entities/turno.dart';
+import 'package:app/entities/usuario.dart';
 import 'package:app/screens/admin/turnos/turnos_details_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +19,7 @@ class TurnItem extends StatelessWidget {
 
     return FutureBuilder<DocumentSnapshot>(
       future:
-          FirebaseFirestore.instance.collection('users').doc(turn.userId).get(),
+          FirebaseFirestore.instance.collection('users').doc(turn.usuarioId).get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // If waiting, show a placeholder widget or return an empty container
@@ -32,12 +32,12 @@ class TurnItem extends StatelessWidget {
           return const Text('Usuario no encontrado');
         }
 
-        User user = User.fromFirestore(snapshot.data!);
+        Usuario user = Usuario.fromFirestore(snapshot.data!);
 
         return Card(
           child: ListTile(
-            leading: _getStateIcon(turn.state),
-            title: Text(user.name),
+            leading: _getStateIcon(turn.estado),
+            title: Text(user.nombre),
             subtitle: Text(formattedDate),
             onTap: () async {
               await Navigator.push(

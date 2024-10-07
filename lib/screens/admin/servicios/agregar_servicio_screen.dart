@@ -12,21 +12,21 @@ class AgregarServicioScreen extends StatefulWidget {
 
 class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _diasAproximadosController = TextEditingController();
+  final _nombreController = TextEditingController();
+  final _precioController = TextEditingController();
+  final _duracionController = TextEditingController();
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _priceController.dispose();
-    _diasAproximadosController.dispose();
+    _nombreController.dispose();
+    _precioController.dispose();
+    _duracionController.dispose();
     super.dispose();
   }
 
-  Future<void> _addService() async {
+  Future<void> _agregarServicio() async {
     if (_formKey.currentState!.validate()) {
-      // Obtener la referencia del nuevo documento en la colección "services"
+      // Obtener la referencia del nuevo documento en la colección 'servicios'
       DocumentReference docRef = FirebaseFirestore.instance
           .collection('servicios')
           .doc();
@@ -34,9 +34,9 @@ class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
       // Crear una instancia de Service con el ID generado por Firebase
       Servicio newService = Servicio(
         id: docRef.id,
-        nombre: _nameController.text,
-        precio: double.parse(_priceController.text),
-        duracion: int.parse(_diasAproximadosController.text),
+        nombre: _nombreController.text,
+        precio: double.parse(_precioController.text),
+        duracion: int.parse(_duracionController.text),
       );
 
       // Guardar el servicio en Firestore
@@ -46,6 +46,8 @@ class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Servicio agregado exitosamente')),
       );
+
+      // Regresar a la pantalla anterior
       Navigator.of(context).pop();
     }
   }
@@ -55,6 +57,7 @@ class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Agregar Servicio'),
+        automaticallyImplyLeading: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,8 +65,9 @@ class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
           key: _formKey,
           child: Column(
             children: [
+              // Nombre
               TextFormField(
-                controller: _nameController,
+                controller: _nombreController,
                 decoration: const InputDecoration(labelText: 'Nombre del Servicio'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -72,8 +76,9 @@ class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
                   return null;
                 },
               ),
+              // Precio
               TextFormField(
-                controller: _priceController,
+                controller: _precioController,
                 decoration: const InputDecoration(labelText: 'Precio'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -86,27 +91,28 @@ class _AgregarServicioScreenState extends State<AgregarServicioScreen> {
                   return null;
                 },
               ),
+              // Duración
               TextFormField(
-                controller: _diasAproximadosController,
-                decoration: const InputDecoration(labelText: 'Días aproximados'),
+                controller: _duracionController,
+                decoration: const InputDecoration(labelText: 'Duración aproximada (minutos)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, ingrese los días aproximados';
+                    return 'Por favor, ingrese los minutos aproximados';
                   }
                   int? dias = int.tryParse(value);
                   if (dias == null) {
                     return 'Por favor, ingrese un número válido';
                   }
-                  if (dias < 1 || dias > 180) {
-                    return 'Por favor, ingrese un valor entre 1 y 180 días';
+                  if (dias < 1 || dias > 540) {
+                    return 'Por favor, ingrese un valor entre 1 y 540 minutos';
                   }
                   return null;
                 },
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _addService,
+                onPressed: _agregarServicio,
                 child: const Text('Agregar Servicio'),
               ),
             ],

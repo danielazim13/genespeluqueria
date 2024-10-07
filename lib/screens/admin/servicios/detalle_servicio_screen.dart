@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:app/entities/servicio.dart';
-import 'package:app/screens/admin/servicios/editar_servicio_screen.dart';
 
 class DetalleServicioScreen extends StatefulWidget {
   final Servicio servicio;
@@ -15,8 +14,8 @@ class DetalleServicioScreen extends StatefulWidget {
 }
 
 class _DetalleServicioScreenState extends State<DetalleServicioScreen> {
-
   Future<Servicio> _fetchServicio() async {
+    // Obtener el documento de la colección 'servicios' con el ID del servicio
     DocumentSnapshot doc = await FirebaseFirestore.instance
         .collection('servicios')
         .doc(widget.servicio.id)
@@ -26,12 +25,15 @@ class _DetalleServicioScreenState extends State<DetalleServicioScreen> {
 
   Future<void> eliminarServicio(BuildContext context) async {
     try {
+      // Eliminar el servicio de Firestore
       await FirebaseFirestore.instance
           .collection('servicios')
           .doc(widget.servicio.id)
           .delete();
+      // Regresar a la pantalla anterior
       context.pop();
     } catch (e) {
+      // Mostrar un mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al eliminar el servicio: $e')),
       );
@@ -43,6 +45,7 @@ class _DetalleServicioScreenState extends State<DetalleServicioScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalles de servicio'),
+        automaticallyImplyLeading: true,
       ),
       body: FutureBuilder<Servicio>(
         future: _fetchServicio(),
@@ -79,7 +82,7 @@ class _DetalleServicioScreenState extends State<DetalleServicioScreen> {
                             decoration: TextDecoration.underline,
                           )),
                       Text(
-                        'Nombre servicio: ${servicio.nombre}',
+                        'Nombre: ${servicio.nombre}',
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
@@ -89,7 +92,7 @@ class _DetalleServicioScreenState extends State<DetalleServicioScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Duracion: ${servicio.duracion}',
+                        'Duración: ${servicio.duracion} minutos',
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 20),
@@ -98,14 +101,8 @@ class _DetalleServicioScreenState extends State<DetalleServicioScreen> {
                         children: [
                           ElevatedButton(
                             onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  // podria agregarse en el router
-                                  builder: (context) =>
-                                      EditarServicioScreen(servicio: servicio),
-                                ),
-                              );
+                              context.push('/admin/servicios/editar',
+                                  extra: servicio);
                             },
                             child: const Text('Editar'),
                           ),

@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:app/entities/servicio.dart';
-import 'package:app/screens/admin/servicios/detalle_servicio_screen.dart';
 
 class ListaServiciosScreen extends StatelessWidget {
   const ListaServiciosScreen({super.key});
@@ -15,7 +14,6 @@ class ListaServiciosScreen extends StatelessWidget {
         title: const Text('Servicios'),
         automaticallyImplyLeading: true,
       ),
-
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('servicios').snapshots(),
         builder: (context, snapshot) {
@@ -41,15 +39,7 @@ class ListaServiciosScreen extends StatelessWidget {
 
               return GestureDetector(
                 onTap: () {
-                  // Navegar a la pantalla de detalles del servicio
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      // Podría agregarse en el router
-                      builder: (context) =>
-                          DetalleServicioScreen(servicio: servicio),
-                    ),
-                  );
+                  context.push('/admin/servicios/detalle', extra: servicio);
                 },
                 child: Card(
                   margin: const EdgeInsets.all(10.0),
@@ -78,8 +68,7 @@ class ListaServiciosScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ),
-                        const Icon(Icons.build),
+                        )
                       ],
                     ),
                   ),

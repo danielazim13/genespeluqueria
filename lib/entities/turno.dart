@@ -7,7 +7,6 @@ class Turn {
   final DateTime ingreso;
   final String estado;
   final double precio;
-  final DateTime egreso;
   final String mensaje;
 
   Turn(
@@ -17,7 +16,6 @@ class Turn {
       required this.ingreso,
       required this.estado,
       required this.precio,
-      required this.egreso,
       required this.mensaje});
 
   factory Turn.fromFirestore(DocumentSnapshot doc) {
@@ -27,7 +25,6 @@ class Turn {
       usuarioId: data['usuarioId'] as String? ?? '',
       servicios: List<String>.from(data['servicios'] ?? []),
       ingreso: (data['ingreso'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      egreso: (data['egreso'] as Timestamp?)?.toDate() ?? DateTime.now(),
       estado: data['estado'] ?? '',
       precio: (data['precio'] as num?)?.toDouble() ?? 0.0,
       mensaje: data['mensaje'] as String? ?? '',
@@ -39,7 +36,6 @@ class Turn {
       'usuarioId': usuarioId,
       'servicios': servicios,
       'ingreso': ingreso,
-      'egreso': egreso,
       'estado': estado,
       'precio': precio,
       'mensaje': mensaje,

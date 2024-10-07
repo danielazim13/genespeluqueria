@@ -152,7 +152,7 @@ class _TurnosListScreenState extends State<TurnosListScreen> {
                           }
                         },
                         child: Text(
-                          'Fecha de ingreso: ${startDate != null ? DateFormat('dd/MM/yyyy').format(startDate!) : 'Seleccione'}',
+                          'Fecha del turno: ${startDate != null ? DateFormat('dd/MM/yyyy').format(startDate!) : 'Seleccione'}',
                           style: const TextStyle(fontSize: 12),
                         ),
                       ),

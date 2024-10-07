@@ -18,7 +18,7 @@ class AdminHomeScreen extends StatelessWidget {
         NavigationButton(
           icon: Icons.cut,
           text: 'Servicios',
-          route: '/administrador/servicios',
+          route: '/admin/servicios/lista',
         ),
       ],
     );

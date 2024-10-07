@@ -1,21 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Service {
+class Servicio {
   final String id;
   final String nombre;
   final double precio;
   final int duracion;
 
-  Service({
+  Servicio({
     required this.id,
     required this.nombre,
     required this.precio,
     required this.duracion,
   });
 
-  factory Service.fromFirestore(DocumentSnapshot doc) {
+  factory Servicio.fromFirestore(DocumentSnapshot doc) {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-    return Service(
+    return Servicio(
       id: doc.id,
       nombre: data['nombre'] ?? '',
       precio: data['precio'] ?? 0.0,

@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:app/screens/usuario/login_screen.dart';
 import 'package:app/screens/usuario/register_screen.dart';
 import 'package:app/screens/pedir_turno_screen.dart';
+import 'package:app/screens/ver_agenda_screen.dart';
 
 // Administrador
 import 'package:app/screens/admin/home_screen.dart';
@@ -92,6 +93,14 @@ GoRoute(
   builder: (context, state) {
     final Usuario? currentUser = state.extra as Usuario?; 
     return SolicitarTurnoScreen(currentUser: currentUser);
+  },
+),
+
+GoRoute(
+  path: '/cliente/verTurnos',
+  builder: (context, state) {
+    final Usuario? currentUser = state.extra as Usuario?; 
+    return AgendaTurnos(currentUser: currentUser);
   },
 ),
 ];

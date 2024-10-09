@@ -21,6 +21,14 @@ class ClienteHomeScreen extends StatelessWidget {
               context.go('/cliente/turno/pedir', extra: currentUser);
             }, route: '/cliente/turno/pedir',
           ),
+          NavigationButton(
+            text: 'Mis turnos',
+            icon: Icons.event_note,
+            onTap: () {
+              context.push('/cliente/verTurnos', extra: currentUser);
+            },
+            route: '/cliente/verTurnos',
+          ),
         ],
       ),
     );

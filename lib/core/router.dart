@@ -91,17 +91,11 @@ final clienteRoutes = [
 
 GoRoute(
   path: '/cliente/turno/pedir',
-  builder: (context, state) =>
-      SolicitarTurnoScreen(usuario: currentUser as Usuario),
-),
-
-/*GoRoute(
-  path: '/cliente/turno/pedir',
   builder: (context, state) {
     final Usuario? currentUser = state.extra as Usuario?; 
     return SolicitarTurnoScreen(currentUser: currentUser);
   },
-),*/
+),
 
 GoRoute(
   path: '/cliente/verTurnos',

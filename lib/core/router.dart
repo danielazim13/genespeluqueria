@@ -71,7 +71,7 @@ final adminRoutes = [
     builder: (context, state) =>
         EditarServicioScreen(servicio: state.extra as Servicio),
   ),
-    // Turnos
+  // Turnos
 
   /*GoRoute(
     path: '/admin/turnos/lista',
@@ -88,20 +88,12 @@ final clienteRoutes = [
     path: '/cliente',
     builder: (context, state) => const ClienteHomeScreen(),
   ),
-
-GoRoute(
-  path: '/cliente/turno/pedir',
-  builder: (context, state) {
-    final Usuario? currentUser = state.extra as Usuario?; 
-    return SolicitarTurnoScreen(currentUser: currentUser);
-  },
-),
-
-GoRoute(
-  path: '/cliente/verTurnos',
-  builder: (context, state) {
-    final Usuario? currentUser = state.extra as Usuario?; 
-    return AgendaTurnos(currentUser: currentUser);
-  },
-),
+  GoRoute(
+    path: '/cliente/turno/pedir',
+    builder: (context, state) => const SolicitarTurnoScreen(),
+  ),
+  GoRoute(
+    path: '/cliente/verTurnos',
+    builder: (context, state) => const AgendaTurnos(),
+  ),
 ];

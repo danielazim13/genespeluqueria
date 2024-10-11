@@ -4,12 +4,10 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/entities/servicio.dart';
 import 'package:app/entities/turno.dart';
-import 'package:app/entities/usuario.dart';
+
 
 class SolicitarTurnoScreen extends StatefulWidget {
-  final Usuario? currentUser;
-
-  const SolicitarTurnoScreen({super.key, this.currentUser});
+  const SolicitarTurnoScreen({super.key});
 
   @override
   _SolicitarTurnoScreenState createState() => _SolicitarTurnoScreenState();

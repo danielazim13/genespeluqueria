@@ -5,8 +5,7 @@ import 'package:app/widgets/navigation_button.dart';
 import 'package:app/entities/usuario.dart';
 
 class ClienteHomeScreen extends StatelessWidget {
-  final Usuario? currentUser;
-  const ClienteHomeScreen({super.key,this.currentUser});
+  const ClienteHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +16,11 @@ class ClienteHomeScreen extends StatelessWidget {
           NavigationButton(
             text: 'Solicitar turno',
             icon: Icons.calendar_month,
-            onTap: () {
-              context.go('/cliente/turno/pedir', extra: currentUser);
-            }, route: '/cliente/turno/pedir',
+            route: '/cliente/turno/pedir',
           ),
           NavigationButton(
             text: 'Mis turnos',
             icon: Icons.event_note,
-            onTap: () {
-              context.push('/cliente/verTurnos', extra: currentUser);
-            },
             route: '/cliente/verTurnos',
           ),
         ],

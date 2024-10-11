@@ -6,8 +6,7 @@ import 'package:app/entities/turno.dart';
 import 'package:app/entities/usuario.dart';
 
 class AgendaTurnos extends StatelessWidget {
-  final Usuario? currentUser;
-  const AgendaTurnos({super.key, this.currentUser});
+  const AgendaTurnos({super.key});
 
   @override
   Widget build(BuildContext context) {

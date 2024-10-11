@@ -13,17 +13,17 @@ class AdminHomeScreen extends StatelessWidget {
         NavigationButton(
           icon: Icons.calendar_month,
           text: 'Agenda',
-          route: '/administrador/turnos', onTap: () {  },
+          route: '/administrador/turnos',
         ),
         NavigationButton(
           icon: Icons.cut,
           text: 'Servicios',
-          route: '/admin/servicios/lista', onTap: () {  },
+          route: '/admin/servicios/lista',
         ),
          NavigationButton(
           text: 'Horas de negocio',
           route: '/administrador/business-hours',
-          icon: Icons.access_time, onTap: () {  },
+          icon: Icons.access_time,
         ),
       ],
     );

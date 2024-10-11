@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -75,35 +76,30 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
     }
   }
 
-  void _solicitarTurno() {
-    // Here you would typically save the turn to Firestore
-    // For this example, we'll just print the details
-    final selectedServiceIds = services
-        .where((service) => selectedServices[service.id] ?? false)
-        .map((service) => service.id)
-        .toList();
+void _solicitarTurno() async {
+  final selectedServiceIds = services
+      .where((service) => selectedServices[service.id] ?? false)
+      .map((service) => service.id)
+      .toList();
 
-    final turno = Turn(
-      usuarioId: widget.currentUser!.id,
-      servicios: selectedServiceIds,
-      ingreso: DateTime(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day,
-        selectedTime.hour,
-        selectedTime.minute,
-      ),
-      estado: 'Pendiente',
-      precio: total,
-      /*egreso:
-          DateTime.now(),*/ // This should be calculated based on service duration
-      mensaje: '',
-    );
+  final turno = Turn(
+    usuarioId: FirebaseAuth.instance.currentUser?.uid ?? '',
+    servicios: selectedServiceIds,
+    ingreso: DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      selectedTime.hour,
+      selectedTime.minute,
+    ),
+    estado: 'Pendiente',
+    precio: total,
+    mensaje: '',
+  );
 
-    print('Turno solicitado: ${turno.toFirestore()}');
-    // Here you would save `turno` to Firestore
-
-
+  try {
+    // Save the turn to Firestore
+    await FirebaseFirestore.instance.collection('turns').add(turno.toFirestore());
 
     // Show a confirmation dialog
     showDialog(
@@ -119,7 +115,24 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
         ],
       ),
     );
+  } catch (e) {
+    // Handle any errors
+    print('Error al guardar el turno: $e');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Error'),
+        content: Text('Hubo un problema al solicitar el turno. Por favor, inténtelo de nuevo.'),
+        actions: [
+          TextButton(
+            child: Text('OK'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {

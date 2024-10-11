@@ -5,18 +5,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/entities/servicio.dart';
 import 'package:app/entities/turno.dart';
 
-
 class SolicitarTurnoScreen extends StatefulWidget {
   const SolicitarTurnoScreen({super.key});
-
   @override
   _SolicitarTurnoScreenState createState() => _SolicitarTurnoScreenState();
 }
 
 class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
+  List<Servicio> services = [];
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
-  List<Servicio> services = [];
   Map<String, bool> selectedServices = {};
   double total = 0;
 
@@ -27,13 +25,10 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   }
 
   void _loadServices() async {
-    // Simulate loading services from Firestore
-    // In a real app, you'd fetch this from Firestore
-    services = [
-      Servicio(id: '1', nombre: 'Peinado', precio: 500, duracion: 30),
-      Servicio(id: '2', nombre: 'Tintura', precio: 1500, duracion: 60),
-      Servicio(id: '3', nombre: 'Extensiones', precio: 5000, duracion: 120),
-    ];
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('servicios').get();
+    services = snapshot.docs.map((doc) => Servicio.fromFirestore(doc)).toList();
+
     setState(() {
       for (var service in services) {
         selectedServices[service.id] = false;
@@ -74,63 +69,66 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
     }
   }
 
-void _solicitarTurno() async {
-  final selectedServiceIds = services
-      .where((service) => selectedServices[service.id] ?? false)
-      .map((service) => service.id)
-      .toList();
+  void _solicitarTurno() async {
+    final selectedServiceIds = services
+        .where((service) => selectedServices[service.id] ?? false)
+        .map((service) => service.id)
+        .toList();
 
-  final turno = Turn(
-    usuarioId: FirebaseAuth.instance.currentUser?.uid ?? '',
-    servicios: selectedServiceIds,
-    ingreso: DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      selectedTime.hour,
-      selectedTime.minute,
-    ),
-    estado: 'Pendiente',
-    precio: total,
-    mensaje: '',
-  );
-
-  try {
-    // Save the turn to Firestore
-    await FirebaseFirestore.instance.collection('turns').add(turno.toFirestore());
-
-    // Show a confirmation dialog
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Turno Solicitado'),
-        content: Text('Su turno ha sido solicitado con éxito.'),
-        actions: [
-          TextButton(
-            child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
+    final turno = Turn(
+      usuarioId: FirebaseAuth.instance.currentUser?.uid ?? '',
+      servicios: selectedServiceIds,
+      ingreso: DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        selectedTime.hour,
+        selectedTime.minute,
       ),
+      estado: 'Pendiente',
+      precio: total,
+      mensaje: '',
     );
-  } catch (e) {
-    // Handle any errors
-    print('Error al guardar el turno: $e');
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Error'),
-        content: Text('Hubo un problema al solicitar el turno. Por favor, inténtelo de nuevo.'),
-        actions: [
-          TextButton(
-            child: Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
+
+    try {
+      // Save the turn to Firestore
+      await FirebaseFirestore.instance
+          .collection('turns')
+          .add(turno.toFirestore());
+
+      // Show a confirmation dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Turno Solicitado'),
+          content: Text('Su turno ha sido solicitado con éxito.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      // Handle any errors
+      print('Error al guardar el turno: $e');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text(
+              'Hubo un problema al solicitar el turno. Por favor, inténtelo de nuevo.'),
+          actions: [
+            TextButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {

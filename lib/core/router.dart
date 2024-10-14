@@ -82,14 +82,14 @@ final adminRoutes = [
 
   // Turnos
 
-  /*GoRoute(
+  GoRoute(
     path: '/admin/turnos/lista',
-    builder: (context, state) => const ListaTurnosScreen(),
+    builder: (context, state) => const TurnosListScreen(),
   ),
   GoRoute(
     path: '/admin/turnos/detalles',
     builder: (context, state) => const ListaDetallesScreen(),
-  ),*/
+  ),
 ];
 
 final clienteRoutes = [

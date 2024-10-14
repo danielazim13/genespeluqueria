@@ -13,7 +13,7 @@ class AdminHomeScreen extends StatelessWidget {
         NavigationButton(
           icon: Icons.calendar_month,
           text: 'Agenda',
-          route: '/administrador/turnos',
+          route: '/admin/turnos/lista',
         ),
         NavigationButton(
           icon: Icons.cut,

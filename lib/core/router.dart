@@ -88,7 +88,7 @@ final adminRoutes = [
   ),
   GoRoute(
     path: '/admin/turnos/detalles',
-    builder: (context, state) => const ListaDetallesScreen(),
+    builder: (context, state) => const TurnoDetailsScreen(),
   ),
 ];
 

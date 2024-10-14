@@ -13,7 +13,7 @@ class AdminHomeScreen extends StatelessWidget {
         NavigationButton(
           icon: Icons.calendar_month,
           text: 'Agenda',
-          route: '/admin/turnos',
+          route: '/admin/turnos/lista',
         ),
         NavigationButton(
           icon: Icons.cut,
@@ -22,7 +22,7 @@ class AdminHomeScreen extends StatelessWidget {
         ),
          NavigationButton(
           text: 'Horas de negocio',
-          route: '/admin/business-hours',
+          route: '/admin/config/business-hours',
           icon: Icons.access_time,
         ),
       ],

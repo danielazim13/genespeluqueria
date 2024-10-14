@@ -146,8 +146,8 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    if (widget.turn.message.isNotEmpty)
-                      _buildDetailRow('Comentarios', widget.turn.message),
+                    if (widget.turn.mensaje.isNotEmpty)
+                      _buildDetailRow('Comentarios', widget.turn.mensaje),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: _updateTurnState,

@@ -18,11 +18,11 @@ class ClienteHomeScreen extends StatelessWidget {
             icon: Icons.calendar_month,
             route: '/cliente/turno/pedir',
           ),
-          NavigationButton(
-            text: 'Mis turnos',
-            icon: Icons.event_note,
-            route: '/cliente/verTurnos',
-          ),
+          //NavigationButton(
+          //  text: 'Mis turnos',
+          //  icon: Icons.event_note,
+          //  route: '/cliente/verTurnos',
+          //),
         ],
       ),
     );

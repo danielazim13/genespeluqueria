@@ -21,6 +21,9 @@ import 'package:app/screens/admin/servicios/editar_servicio_screen.dart';
 import 'package:app/screens/admin/turnos/turnos_details_screen.dart';
 import 'package:app/screens/admin/turnos/turnos_list_screen.dart';
 
+// Administrador > Business-Hours
+import 'package:app/screens/admin/config/business_hours_screen.dart';
+
 // Cliente
 import 'package:app/screens/cliente_screen.dart';
 
@@ -71,6 +74,12 @@ final adminRoutes = [
     builder: (context, state) =>
         EditarServicioScreen(servicio: state.extra as Servicio),
   ),
+  // Business-Hours
+  GoRoute(
+    path: '/admin/config/business-hours',
+    builder: (context, state) => const BusinessHoursScreen(),
+  ),
+
   // Turnos
 
   /*GoRoute(

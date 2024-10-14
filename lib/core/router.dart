@@ -1,4 +1,5 @@
 import 'package:app/entities/servicio.dart';
+import 'package:app/entities/turno.dart';
 import 'package:app/entities/usuario.dart';
 import 'package:app/screens/usuario/edit_screen.dart';
 import 'package:go_router/go_router.dart';
@@ -88,7 +89,7 @@ final adminRoutes = [
   ),
   GoRoute(
     path: '/admin/turnos/detalles',
-    builder: (context, state) => const TurnoDetailsScreen(),
+    builder: (context, state) => TurnoDetailsScreen(turn: state.extra as Turn),
   ),
 ];
 

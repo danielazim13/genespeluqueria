@@ -19,7 +19,7 @@ class TurnItem extends StatelessWidget {
 
     return FutureBuilder<DocumentSnapshot>(
       future:
-          FirebaseFirestore.instance.collection('users').doc(turn.usuarioId).get(),
+          FirebaseFirestore.instance.collection('usuarios').doc(turn.usuarioId).get(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // If waiting, show a placeholder widget or return an empty container

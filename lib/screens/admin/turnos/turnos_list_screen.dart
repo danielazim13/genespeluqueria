@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/entities/turno.dart';
 import 'package:app/widgets/turn_item.dart';
-import 'package:intl/intl.dart'; // Para formatear fechas
+import 'package:intl/intl.dart';
 
 class TurnosListScreen extends StatefulWidget {
   const TurnosListScreen({Key? key}) : super(key: key);
-
   @override
   _TurnosListScreenState createState() => _TurnosListScreenState();
 }

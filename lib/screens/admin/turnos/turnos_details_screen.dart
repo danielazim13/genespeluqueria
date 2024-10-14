@@ -42,7 +42,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
           .get();
       if (snapshot.exists) {
         setState(() {
-          _turnService = snapshot['service'];
+          _turnService = snapshot['servicio'] ?? 'Servicio no disponible';
         });
       }
     } catch (e) {
@@ -53,12 +53,12 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
   Future<void> _fetchUserDetails() async {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('users')
+          .collection('usuarios')
           .doc(widget.turn.usuarioId)
           .get();
       if (snapshot.exists) {
         setState(() {
-          _userDetails = snapshot['name'] ?? 'Nombre no disponible';
+          _userDetails = snapshot['nombre'] ?? 'Nombre no disponible';
         });
       }
     } catch (e) {

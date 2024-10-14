@@ -69,7 +69,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
   void _updateTurnState() async {
     try {
       await FirebaseFirestore.instance
-          .collection('turnos')
+          .collection('turns')
           .doc(widget.turn.id)
           .update({'state': _selectedState});
       ScaffoldMessenger.of(context).showSnackBar(
@@ -146,8 +146,8 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    if (widget.turn.mensaje.isNotEmpty)
-                      _buildDetailRow('Comentarios', widget.turn.mensaje),
+                    if (widget.turn.message.isNotEmpty)
+                      _buildDetailRow('Comentarios', widget.turn.message),
                     const SizedBox(height: 10),
                     ElevatedButton(
                       onPressed: _updateTurnState,

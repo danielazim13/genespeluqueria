@@ -1,6 +1,6 @@
 {
-    "name": "aplicacion_taller",
-    "short_name": "aplicacion_taller",
+    "name": "genespeluqueria",
+    "short_name": "genespeluqueria",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

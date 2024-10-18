@@ -8,7 +8,7 @@
     "ios": true,
     "linux": true,
     "macos": true,
-    "web": true,
+    "web": false,
     "windows": true,
     // root files
     ".firebaserc": true,

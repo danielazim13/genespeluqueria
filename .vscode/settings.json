@@ -28,15 +28,6 @@
     "functions/package-lock.json": true,
     // ...
     ".firebase": true,
-    ".github": false,
-    "public": true,
-    ".gitignore": false,
-    // wip
-    //"lib/main-og.dart": true,
-    //"lib/assets": true,
-    //"lib/core": true,
-    //"lib/routes": true,
-    //"lib/screens": true,
-    //"lib/theme": true
+    "public": true
   }
 }

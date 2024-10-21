@@ -61,8 +61,8 @@ final clienteRoutes = [
     builder: (context, state) => const SolicitarTurnoScreen(),
   ),
   GoRoute(
-    path: '/cliente/verTurnos',
-    builder: (context, state) => const AgendaTurnos(),
+    path: '/cliente/turno/lista',
+    builder: (context, state) => const ClienteListaTurnosScreen(),
   ),
 ];
 

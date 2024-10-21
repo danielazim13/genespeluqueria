@@ -20,7 +20,7 @@ class ClienteHomeScreen extends StatelessWidget {
           NavigationButton(
             text: 'Mis turnos',
             icon: Icons.event_note,
-            route: '/cliente/verTurnos',
+            route: '/cliente/turno/lista',
           ),
         ],
       ),

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+
 import 'package:app/widgets/home_screen_base.dart';
-import 'package:app/widgets/navigation_button.dart';
-import 'package:app/entities/usuario.dart';
+import 'package:app/widgets/menu_item.dart';
 
 class ClienteHomeScreen extends StatelessWidget {
   const ClienteHomeScreen({super.key});
@@ -18,11 +17,11 @@ class ClienteHomeScreen extends StatelessWidget {
             icon: Icons.calendar_month,
             route: '/cliente/turno/pedir',
           ),
-          //NavigationButton(
-          //  text: 'Mis turnos',
-          //  icon: Icons.event_note,
-          //  route: '/cliente/verTurnos',
-          //),
+          NavigationButton(
+            text: 'Mis turnos',
+            icon: Icons.event_note,
+            route: '/cliente/verTurnos',
+          ),
         ],
       ),
     );

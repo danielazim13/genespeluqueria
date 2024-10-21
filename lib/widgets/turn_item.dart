@@ -1,6 +1,6 @@
 import 'package:app/entities/turno.dart';
 import 'package:app/entities/usuario.dart';
-import 'package:app/screens/admin/turnos/turnos_details_screen.dart';
+import 'package:app/screens/admin/turnos/detalle_turno_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';

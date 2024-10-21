@@ -8,7 +8,7 @@
     "ios": true,
     "linux": true,
     "macos": true,
-    "web": false,
+    "web": true,
     "windows": true,
     // root files
     ".firebaserc": true,
@@ -29,5 +29,25 @@
     // ...
     ".firebase": true,
     "public": true
-  }
+  },
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#bfa3cb",
+    "activityBar.background": "#bfa3cb",
+    "activityBar.foreground": "#15202b",
+    "activityBar.inactiveForeground": "#15202b99",
+    "activityBarBadge.background": "#7a6a45",
+    "activityBarBadge.foreground": "#e7e7e7",
+    "commandCenter.border": "#15202b99",
+    "sash.hoverBorder": "#bfa3cb",
+    "statusBar.background": "#a983b8",
+    "statusBar.foreground": "#15202b",
+    "statusBarItem.hoverBackground": "#9263a5",
+    "statusBarItem.remoteBackground": "#a983b8",
+    "statusBarItem.remoteForeground": "#15202b",
+    "titleBar.activeBackground": "#a983b8",
+    "titleBar.activeForeground": "#15202b",
+    "titleBar.inactiveBackground": "#a983b899",
+    "titleBar.inactiveForeground": "#15202b99"
+  },
+  "peacock.color": "#a983b8"
 }

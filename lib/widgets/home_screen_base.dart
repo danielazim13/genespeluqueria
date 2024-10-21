@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
-import 'package:app/widgets/navigation_button.dart';
+import 'package:app/widgets/menu_item.dart';
 
 class HomeScreenBase extends StatelessWidget {
   final String title;
@@ -13,10 +13,18 @@ class HomeScreenBase extends StatelessWidget {
     required this.buttons,
   });
 
-  Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
-    // ignore: use_build_context_synchronously
-    context.go('/');
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: SingleChildScrollView(
+        child: Column(
+          children: buttons.map((button) {
+            return button;
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   AppBar _buildAppBar(BuildContext context) {
@@ -49,17 +57,9 @@ class HomeScreenBase extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        child: Column(
-          children: buttons.map((button) {
-            return button;
-          }).toList(),
-        ),
-      ),
-    );
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    // ignore: use_build_context_synchronously
+    context.go('/');
   }
 }

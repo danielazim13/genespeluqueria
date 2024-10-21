@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:app/widgets/home_screen_base.dart';
-import 'package:app/widgets/navigation_button.dart';
+import 'package:app/widgets/menu_item.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});

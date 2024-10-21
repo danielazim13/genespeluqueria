@@ -1,3 +1,7 @@
+import 'package:app/entities/usuario.dart';
+import 'package:app/screens/admin/metricas_screen.dart';
+import 'package:app/screens/admin/usuarios/detalle_usuario_screen.dart';
+import 'package:app/screens/admin/usuarios/lista_usuarios_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Entities
@@ -79,6 +83,20 @@ final adminRoutes = [
   GoRoute(
     path: '/admin/turnos/detalles',
     builder: (context, state) => TurnoDetailsScreen(turn: state.extra as Turn),
+  ),
+  // Usuarios
+  GoRoute(
+    path: '/admin/usuarios',
+    builder: (context, state) => const UsuariosScreen(),
+  ),
+  GoRoute(
+    path: '/admin/usuarios/detalles',
+    builder: (context, state) => ProfileScreen(user: state.extra as Usuario),
+  ),
+  // Metricas
+  GoRoute(
+    path: '/admin/metricas',
+    builder: (context, state) => const MetricasScreen(),
   ),
   // Config
   GoRoute(

@@ -16,6 +16,16 @@ class AdminHomeScreen extends StatelessWidget {
           route: '/admin/turnos/lista',
         ),
         NavigationButton(
+          text: 'Usuarios',
+          route: '/admin/usuarios',
+          icon: Icons.group,
+        ),
+         NavigationButton(
+          text: 'Metricas',
+          route: '/admin/metricas',
+          icon: Icons.bar_chart,
+        ),
+        NavigationButton(
           icon: Icons.cut,
           text: 'Servicios',
           route: '/admin/servicios/lista',

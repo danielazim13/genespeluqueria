@@ -42,7 +42,7 @@ class HomeScreenBase extends StatelessWidget {
       // derecha
       actions: [
         IconButton(
-          icon: const Icon(Icons.person),
+          icon: const Icon(Icons.account_circle),
           iconSize: 36,
           onPressed: () {
             context.push('/editar');

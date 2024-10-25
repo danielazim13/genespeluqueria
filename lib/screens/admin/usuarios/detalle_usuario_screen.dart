@@ -299,159 +299,172 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget latestTurns(BuildContext context) {
-  return Column(
-    children: [
-      const SizedBox(height: 20),
-      Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Últimos Turnos',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                  child: Icon(
-                    Icons.calendar_today,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                title: const Text(
-                  'Corte',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-                subtitle: const Text(
-                  '24 de Octubre, 15:30',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                trailing: _getStatusChip('Completado'),
-              ),
-              const Divider(),
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                  child: Icon(
-                    Icons.calendar_today,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                title: const Text(
-                  'Alisado',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-                subtitle: const Text(
-                  '22 de Octubre, 10:00',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                trailing: _getStatusChip('Cancelado'),
-              ),
-              const Divider(),
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-                  child: Icon(
-                    Icons.calendar_today,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                title: const Text(
-                  'Corte',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                ),
-                subtitle: const Text(
-                  '20 de Octubre, 18:45',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                trailing: _getStatusChip('Completado'),
-              ),
-            ],
-          ),
-        ),
-      ),
-      const SizedBox(height: 20),
-      FilledButton.icon(
-        onPressed: () {
-          // Navigate to full turns list
-          // Navigator.push(context, MaterialPageRoute(builder: (context) => TurnsListScreen()));
-        },
-        icon: const Icon(Icons.list),
-        label: const Text('Ver Todos'),
-        style: FilledButton.styleFrom(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 32,
-            vertical: 12,
-          ),
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        Card(
+          elevation: 4,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Últimos Turnos',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('turns')
+                      .where('usuarioId', isEqualTo: user.id)
+                      //.orderBy('ingreso', descending: true)
+                      .limit(3)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      print(snapshot.data);
+                      return const Center(
+                        child: Text('Error al cargar los turnos'),
+                      );
+                    }
+
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+
+                    if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                      return const Center(
+                        child: Text('No hay turnos registrados'),
+                      );
+                    }
+
+                    return Column(
+                      children: snapshot.data!.docs.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        final fecha = (data['ingreso'] as Timestamp).toDate();
+
+                        return Column(
+                          children: [
+                            ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: Theme.of(context)
+                                    .primaryColor
+                                    .withOpacity(0.1),
+                                child: Icon(
+                                  Icons.calendar_today,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                              title: Text(
+                                data['servicio'] ?? 'Sin servicio',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              subtitle: Text(
+                                '${fecha.day} de ${_getMonthName(fecha.month)}, ${fecha.hour.toString().padLeft(2, '0')}:${fecha.minute.toString().padLeft(2, '0')}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              trailing:
+                                  _getStatusChip(data['estado'] ?? 'Pendiente'),
+                            ),
+                            if (snapshot.data!.docs.last != doc)
+                              const Divider(),
+                          ],
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    ],
-  );
-}
-
-Widget _getStatusChip(String status) {
-  Color chipColor;
-  Color textColor;
-
-  switch (status.toLowerCase()) {
-    case 'completado':
-      chipColor = Colors.green.withOpacity(0.1);
-      textColor = Colors.green;
-      break;
-    case 'cancelado':
-      chipColor = Colors.red.withOpacity(0.1);
-      textColor = Colors.red;
-      break;
-    default:
-      chipColor = Colors.orange.withOpacity(0.1);
-      textColor = Colors.orange;
+        const SizedBox(height: 20),
+        FilledButton.icon(
+          onPressed: () {
+            // Navigate to full turns list
+            // Navigator.push(context, MaterialPageRoute(builder: (context) => TurnsListScreen()));
+          },
+          icon: const Icon(Icons.list),
+          label: const Text('Ver Todos'),
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 32,
+              vertical: 12,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-    decoration: BoxDecoration(
-      color: chipColor,
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Text(
-      status,
-      style: TextStyle(
-        color: textColor,
-        fontWeight: FontWeight.w500,
-        fontSize: 12,
+  String _getMonthName(int month) {
+    const months = [
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre'
+    ];
+    return months[month - 1];
+  }
+
+  Widget _getStatusChip(String status) {
+    Color chipColor;
+    Color textColor;
+
+    switch (status.toLowerCase()) {
+      case 'completado':
+        chipColor = Colors.green.withOpacity(0.1);
+        textColor = Colors.green;
+        break;
+      case 'cancelado':
+        chipColor = Colors.red.withOpacity(0.1);
+        textColor = Colors.red;
+        break;
+      default:
+        chipColor = Colors.orange.withOpacity(0.1);
+        textColor = Colors.orange;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: chipColor,
+        borderRadius: BorderRadius.circular(12),
       ),
-    ),
-  );
-}
+      child: Text(
+        status,
+        style: TextStyle(
+          color: textColor,
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
 }

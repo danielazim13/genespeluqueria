@@ -1,12 +1,9 @@
-import 'package:app/entities/usuario.dart';
-import 'package:app/screens/admin/metricas_screen.dart';
-import 'package:app/screens/admin/usuarios/detalle_usuario_screen.dart';
-import 'package:app/screens/admin/usuarios/lista_usuarios_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Entities
 import 'package:app/entities/servicio.dart';
 import 'package:app/entities/turno.dart';
+import 'package:app/entities/usuario.dart';
 
 // Usuario
 import 'package:app/screens/usuario/login_screen.dart';
@@ -24,8 +21,12 @@ import 'package:app/screens/admin/home_screen.dart';
 // A/Turnos
 import 'package:app/screens/admin/turnos/detalle_turno_screen.dart';
 import 'package:app/screens/admin/turnos/lista_turnos_screen.dart';
+// A/Usuarios
+import 'package:app/screens/admin/usuarios/detalle_usuario_screen.dart';
+import 'package:app/screens/admin/usuarios/lista_usuarios_screen.dart';
 // A/Config
 import 'package:app/screens/admin/config/horarios_screen.dart';
+import 'package:app/screens/admin/metricas_screen.dart';
 // A/Servicios
 import 'package:app/screens/admin/servicios/lista_servicios_screen.dart';
 import 'package:app/screens/admin/servicios/agregar_servicio_screen.dart';

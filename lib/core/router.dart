@@ -2,6 +2,7 @@ import 'package:app/entities/usuario.dart';
 import 'package:app/screens/admin/metricas_screen.dart';
 import 'package:app/screens/admin/usuarios/detalle_usuario_screen.dart';
 import 'package:app/screens/admin/usuarios/lista_usuarios_screen.dart';
+import 'package:app/screens/cliente/turnos/reprogramar_turno_screen.dart';
 import 'package:go_router/go_router.dart';
 
 // Entities
@@ -68,6 +69,13 @@ final clienteRoutes = [
     path: '/cliente/turno/lista',
     builder: (context, state) => const ClienteListaTurnosScreen(),
   ),
+  GoRoute(
+    path:'/cliente/turno/reprogramar/:turnoId',
+    builder:(context, state){
+      final turnoId = state.pathParameters['turnoId']!;
+      return ReprogramarTurnoScreen(turnoId: turnoId);
+    },
+    )
 ];
 
 final adminRoutes = [

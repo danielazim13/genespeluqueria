@@ -1,9 +1,11 @@
+import 'package:app/core/router.dart';
 import 'package:flutter/material.dart';
 //import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:app/entities/turno.dart';
+import 'package:go_router/go_router.dart';
 
 class ClienteListaTurnosScreen extends StatelessWidget {
   const ClienteListaTurnosScreen({super.key});
@@ -129,6 +131,11 @@ class _TurnItem extends StatelessWidget {
             )
           ],
         ),
+        onTap: () {
+          if(turn.estado =='Pendiente' || turn.estado =='Confirmado' || turn.estado =='En Progreso') {
+             context.push('/cliente/turno/reprogramar/${turn.id}');
+          }
+        },
       ),
     );
   }

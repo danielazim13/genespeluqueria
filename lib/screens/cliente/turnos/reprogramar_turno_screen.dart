@@ -18,8 +18,8 @@ class _ReprogramarTurnoScreenState extends State<ReprogramarTurnoScreen> {
 Future <void> _selectDate (BuildContext context) async{
   final DateTime? picked = await showDatePicker(
     context: context,
-    initialDate: selectedDate, 
-    firstDate: DateTime.now(), 
+    initialDate: selectedDate,
+    firstDate: DateTime.now(),
     lastDate: DateTime.now().add(const Duration(days:365)),
     );
 
@@ -31,7 +31,7 @@ Future <void> _selectDate (BuildContext context) async{
 }
 Future<void> _selectTime(BuildContext context) async {
   final TimeOfDay? picked = await showTimePicker(
-    context: context, 
+    context: context,
     initialTime: selectedTime,
     );
     if(picked !=null && picked !=selectedTime){
@@ -49,7 +49,7 @@ Future <void> _reprogramarTurno() async {
       selectedTime.hour,
       selectedTime.minute,
     );
-    await FirebaseFirestore.instance.collection('turnos').doc(widget.turnoId).update({'ingreso': ingreso});
+    await FirebaseFirestore.instance.collection('turns').doc(widget.turnoId).update({'ingreso': ingreso});
 
     Navigator.of(context).pop();
   } catch(e) {
@@ -60,7 +60,7 @@ Future <void> _reprogramarTurno() async {
         title: Text('Error'),
         content: Text('No se pudo reprogramar el turno'),
         actions: [
-          TextButton( 
+          TextButton(
             child: Text('OK'),
             onPressed: ()=> Navigator.of(context).pop(),
             ),
@@ -98,7 +98,7 @@ Future <void> _reprogramarTurno() async {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _reprogramarTurno, 
+                onPressed: _reprogramarTurno,
                 child: Text('Confirmar repogramación'),
                 ),
             ),
@@ -106,5 +106,5 @@ Future <void> _reprogramarTurno() async {
         ),
         ),
     );
-  } 
+  }
 }

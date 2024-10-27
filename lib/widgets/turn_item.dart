@@ -14,43 +14,30 @@ class TurnItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String formattedDate =
-        DateFormat('dd MMM yyyy, hh:mm a').format(turn.ingreso);
+    String formattedDate = DateFormat('dd/MM/yy').format(turn.ingreso);
+    String formattedTime = DateFormat('HH:mm').format(turn.ingreso);
 
-    return FutureBuilder<DocumentSnapshot>(
-      future:
-          FirebaseFirestore.instance.collection('usuarios').doc(turn.usuarioId).get(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // If waiting, show a placeholder widget or return an empty container
-          return Container();
-        }
-        if (snapshot.hasError) {
-          return const Text('Error al cargar usuario');
-        }
-        if (!snapshot.hasData || !snapshot.data!.exists) {
-          return const Text('Usuario no encontrado');
-        }
-
-        Usuario user = Usuario.fromFirestore(snapshot.data!);
-
-        return Card(
-          child: ListTile(
-            leading: _getStateIcon(turn.estado),
-            title: Text(user.nombre),
-            subtitle: Text(formattedDate),
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TurnoDetailsScreen(turn: turn),
-                ),
-              );
-              actualizadoPagina();
-            },
-          ),
-        );
-      },
+    return Card(
+      child: ListTile(
+        leading: _getStateIcon(turn.estado),
+        title: Text('Lorem ipsum'), // Text(user.nombre),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(formattedDate),
+            Text(formattedTime),
+          ],
+        ),
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TurnoDetailsScreen(turn: turn),
+            ),
+          );
+          actualizadoPagina();
+        },
+      ),
     );
   }
 

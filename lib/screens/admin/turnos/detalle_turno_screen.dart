@@ -38,7 +38,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('turnos')
-          .doc(widget.turn.usuarioId)
+          .doc(widget.turn.usuario.id)
           .get();
       if (snapshot.exists) {
         setState(() {
@@ -54,7 +54,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
           .collection('usuarios')
-          .doc(widget.turn.usuarioId)
+          .doc(widget.turn.usuario.id)
           .get();
       if (snapshot.exists) {
         setState(() {

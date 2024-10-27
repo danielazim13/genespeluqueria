@@ -64,8 +64,7 @@ class _TurnosListScreenState extends State<TurnosListScreen> {
       bool withinIngresoDates = true;
 
       if (useIngresoFilter && startDate != null) {
-        withinIngresoDates =
-            turn.ingreso.isAfter(startDate!);
+        withinIngresoDates = turn.ingreso.isAfter(startDate!);
       }
 
       return withinIngresoDates;

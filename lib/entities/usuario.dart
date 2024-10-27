@@ -21,4 +21,19 @@ class Usuario {
       esAdmin: data['esAdmin'] ?? false,
     );
   }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'nombre': nombre,
+        'telefono': telefono,
+        'esAdmin': esAdmin,
+      };
+
+  factory Usuario.fromMap(Map<String, dynamic> map) {
+    return Usuario(
+      id: map['id'] ?? '',
+      nombre: map['nombre'] ?? '',
+      telefono: map['telefono'] ?? '',
+      esAdmin: map['esAdmin'] ?? false,
+    );
+  }
 }

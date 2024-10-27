@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app/widgets/menu_item.dart';
+import 'package:app/Global/globals.dart' as globals;
+
 
 class HomeScreenBase extends StatelessWidget {
   final String title;
@@ -16,15 +18,16 @@ class HomeScreenBase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        child: Column(
-          children: buttons.map((button) {
-            return button;
-          }).toList(),
+        appBar: _buildAppBar(context),
+        body: SingleChildScrollView(
+          child: Column(
+            children: buttons.map((button) {
+              return button;
+            }).toList(),
+          ),
         ),
-      ),
-    );
+      );
+
   }
 
   AppBar _buildAppBar(BuildContext context) {
@@ -48,11 +51,17 @@ class HomeScreenBase extends StatelessWidget {
             context.push('/editar');
           },
         ),
+        Switch(value: globals.changeTheme.isdarktheme, onChanged: (_) {
+
+          globals.changeTheme.darktheme();
+        }),
         IconButton(
           icon: const Icon(Icons.logout),
           iconSize: 36,
           onPressed: () => _logout(context),
         )
+        
+
       ],
     );
   }

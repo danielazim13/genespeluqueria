@@ -31,7 +31,7 @@ class ClienteListaTurnosScreen extends StatelessWidget {
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('turns')
-                .where('usuarioId', isEqualTo: userId)
+                .where('usuario.id', isEqualTo: userId)
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {

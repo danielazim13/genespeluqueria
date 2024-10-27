@@ -1,3 +1,4 @@
+import 'package:app/entities/usuario.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -70,27 +71,35 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   }
 
   void _solicitarTurno() async {
-    final selectedServiceIds = services
-        .where((service) => selectedServices[service.id] ?? false)
-        .map((service) => service.id)
-        .toList();
-
-    final turno = Turn(
-      usuarioId: FirebaseAuth.instance.currentUser?.uid ?? '',
-      servicios: selectedServiceIds,
-      ingreso: DateTime(
-        selectedDate.year,
-        selectedDate.month,
-        selectedDate.day,
-        selectedTime.hour,
-        selectedTime.minute,
-      ),
-      estado: 'Pendiente',
-      precio: total,
-      mensaje: '',
-    );
-
     try {
+      // Fetch the authenticated user's data from Firestore
+      final usuarioDoc = await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .get();
+      final usuario = Usuario.fromFirestore(usuarioDoc);
+
+      // Fetch full Servicio data for selected services
+      final selectedServicios = services
+          .where((service) => selectedServices[service.id] ?? false)
+          .toList();
+
+      // Create a Turn with full Usuario and Servicio data
+      final turno = Turn(
+        usuario: usuario,
+        servicios: selectedServicios,
+        ingreso: DateTime(
+          selectedDate.year,
+          selectedDate.month,
+          selectedDate.day,
+          selectedTime.hour,
+          selectedTime.minute,
+        ),
+        estado: 'Pendiente',
+        precio: total,
+        mensaje: '',
+      );
+
       // Save the turn to Firestore
       await FirebaseFirestore.instance
           .collection('turns')

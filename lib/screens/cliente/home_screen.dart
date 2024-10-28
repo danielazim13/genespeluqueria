@@ -22,6 +22,11 @@ class ClienteHomeScreen extends StatelessWidget {
             icon: Icons.event_note,
             route: '/cliente/turno/lista',
           ),
+          NavigationButton(
+            text: 'Información',
+            icon: Icons.info,
+            route: '/info',
+          ),
         ],
       ),
     );

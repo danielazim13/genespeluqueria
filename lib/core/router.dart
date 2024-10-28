@@ -2,6 +2,7 @@ import 'package:app/entities/usuario.dart';
 import 'package:app/screens/admin/metricas_screen.dart';
 import 'package:app/screens/admin/usuarios/detalle_usuario_screen.dart';
 import 'package:app/screens/admin/usuarios/lista_usuarios_screen.dart';
+import 'package:app/screens/cliente/info_screen.dart';
 import 'package:app/screens/cliente/turnos/reprogramar_turno_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -70,12 +71,16 @@ final clienteRoutes = [
     builder: (context, state) => const ClienteListaTurnosScreen(),
   ),
   GoRoute(
-    path:'/cliente/turno/reprogramar/:turnoId',
-    builder:(context, state){
+    path: '/cliente/turno/reprogramar/:turnoId',
+    builder: (context, state) {
       final turnoId = state.pathParameters['turnoId']!;
       return ReprogramarTurnoScreen(turnoId: turnoId);
     },
-    )
+  ),
+  GoRoute(
+    path: '/info',
+    builder: (context, state) => InfoScreen(),
+  ),
 ];
 
 final adminRoutes = [
@@ -100,6 +105,13 @@ final adminRoutes = [
   GoRoute(
     path: '/admin/usuarios/detalles',
     builder: (context, state) => ProfileScreen(user: state.extra as Usuario),
+  ),
+  GoRoute(
+    path: '/admin/turno/lista/:userId',
+    builder: (context, state) {
+      final userId = state.pathParameters['userId']!;
+      return ClienteListaTurnosScreen(userId: userId);
+    },
   ),
   // Metricas
   GoRoute(

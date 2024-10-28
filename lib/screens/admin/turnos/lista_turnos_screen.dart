@@ -43,18 +43,31 @@ class _TurnosListScreenState extends State<TurnosListScreen> {
   }
 
   void _fetchTurns() async {
+    setState(() => isLoading = true);
+
     try {
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('turns').get();
       setState(() {
-        allTurns = snapshot.docs.map((doc) => Turn.fromFirestore(doc)).toList();
-        isLoading = false;
+        allTurns = snapshot.docs
+            .map((doc) {
+              try {
+                return Turn.fromFirestore(doc);
+              } catch (e) {
+                print("Error parsing Turn from Firestore: $e");
+                return null; // Handle nulls in `filteredTurns` mapping if necessary
+              }
+            })
+            .whereType<Turn>()
+            .toList(); // Exclude nulls from parse failures
       });
     } catch (error) {
-      setState(() {
-        isLoading = false;
-      });
-      // Handle error appropriately here
+      print("Error fetching turns: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error loading turns. Please try again.")),
+      );
+    } finally {
+      setState(() => isLoading = false);
     }
   }
 
@@ -78,6 +91,7 @@ class _TurnosListScreenState extends State<TurnosListScreen> {
         ? allTurns.where((turn) => turn.estado == selectedState!.value).toList()
         : allTurns;
 
+    print(filteredTurns);
     filteredTurns = _filterByDate(filteredTurns);
 
     return Scaffold(

@@ -1,69 +1,60 @@
-import 'package:app/core/router.dart';
+//import 'package:app/core/router.dart';
 import 'package:flutter/material.dart';
-//import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:app/entities/turno.dart';
 import 'package:go_router/go_router.dart';
 
 class ClienteListaTurnosScreen extends StatelessWidget {
-  const ClienteListaTurnosScreen({super.key});
+  final String? userId;
+
+  const ClienteListaTurnosScreen({super.key, this.userId});
 
   @override
   Widget build(BuildContext context) {
+    final effectiveUserId = userId ?? FirebaseAuth.instance.currentUser?.uid;
+
+    if (effectiveUserId == null) {
+      return const Center(child: Text('No has iniciado sesión'));
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mis turnos'),
       ),
-      body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, authSnapshot) {
-          if (authSnapshot.connectionState == ConnectionState.waiting) {
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('turns')
+            .where('usuario.id', isEqualTo: effectiveUserId)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error al cargar los turnos'));
           }
-          if (!authSnapshot.hasData) {
-            return const Center(child: Text('No has iniciado sesión'));
+
+          final data = snapshot.requireData;
+          List<Turn> turns =
+              data.docs.map((doc) => Turn.fromFirestore(doc)).toList();
+
+          if (turns.isEmpty) {
+            return const Center(child: Text('No hay turnos disponibles'));
           }
 
-          final String userId = authSnapshot.data!.uid;
+          List<Turn> inProgressTurns = turns
+              .where((turn) =>
+                  turn.estado == 'Pendiente' ||
+                  turn.estado == 'Confirmado' ||
+                  turn.estado == 'En Progreso')
+              .toList();
 
-          return StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance
-                .collection('turns')
-                .where('usuario.id', isEqualTo: userId)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return const Center(child: Text('Error al cargar los turnos'));
-              }
+          List<Turn> doneTurns =
+              turns.where((turn) => turn.estado == 'Realizado').toList();
 
-              final data = snapshot.requireData;
-              List<Turn> turns =
-                  data.docs.map((doc) => Turn.fromFirestore(doc)).toList();
-              print(data);
-
-              if (turns.isEmpty) {
-                return const Center(child: Text('No hay turnos disponibles'));
-              }
-
-              List<Turn> inProgressTurns = turns
-                  .where((turn) =>
-                      turn.estado == 'Pendiente' ||
-                      turn.estado == 'Confirmado' ||
-                      turn.estado == 'En Progreso')
-                  .toList();
-
-              List<Turn> doneTurns =
-                  turns.where((turn) => turn.estado == 'Realizado').toList();
-
-              return _ListTurnView(
-                inProgressTurns: inProgressTurns,
-                doneTurns: doneTurns,
-              );
-            },
+          return _ListTurnView(
+            inProgressTurns: inProgressTurns,
+            doneTurns: doneTurns,
           );
         },
       ),
@@ -88,7 +79,7 @@ class _ListTurnView extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Turnos en progreso',
+              'Turnos en Progreso',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -99,7 +90,7 @@ class _ListTurnView extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Turnos finalizados',
+              'Turnos Finalizados',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -132,8 +123,10 @@ class _TurnItem extends StatelessWidget {
           ],
         ),
         onTap: () {
-          if(turn.estado =='Pendiente' || turn.estado =='Confirmado' || turn.estado =='En Progreso') {
-             context.push('/cliente/turno/reprogramar/${turn.id}');
+          if (turn.estado == 'Pendiente' ||
+              turn.estado == 'Confirmado' ||
+              turn.estado == 'En Progreso') {
+            context.push('/cliente/turno/reprogramar/${turn.id}');
           }
         },
       ),

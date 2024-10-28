@@ -1,7 +1,5 @@
 import 'package:app/entities/turno.dart';
-import 'package:app/entities/usuario.dart';
 import 'package:app/screens/admin/turnos/detalle_turno_screen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -20,10 +18,11 @@ class TurnItem extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: _getStateIcon(turn.estado),
-        title: Text('Lorem ipsum'), // Text(user.nombre),
+        title: Text(turn.servicios.map((s) => s.nombre).join(', ')),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(turn.usuario.nombre),
             Text(formattedDate),
             Text(formattedTime),
           ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/entities/usuario.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
   final Usuario user;
@@ -95,11 +96,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   setState(() {
                     user = Usuario(
-                      id: user.id,
-                      nombre: nameController.text,
-                      telefono: phoneController.text,
-                      esAdmin: user.esAdmin
-                    );
+                        id: user.id,
+                        nombre: nameController.text,
+                        telefono: phoneController.text,
+                        esAdmin: user.esAdmin);
                   });
 
                   Navigator.of(context).pop();
@@ -138,7 +138,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text('Perfil:',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Card(
                   elevation: 4,
                   child: ListTile(
@@ -149,6 +150,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () => _editUserInfo(context),
                     ),
                   ),
+                ),
+                const SizedBox(height: 16),
+                TextButton.icon(
+                  onPressed: () {
+                    context.push('/admin/turno/lista/${user.id}');
+                  },
+                  icon: const Icon(Icons.list),
+                  label: const Text('Ver Turnos'),
                 ),
               ],
             ),

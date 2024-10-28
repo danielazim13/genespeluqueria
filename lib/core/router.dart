@@ -106,6 +106,13 @@ final adminRoutes = [
     path: '/admin/usuarios/detalles',
     builder: (context, state) => ProfileScreen(user: state.extra as Usuario),
   ),
+  GoRoute(
+    path: '/admin/turno/lista/:userId',
+    builder: (context, state) {
+      final userId = state.pathParameters['userId']!;
+      return ClienteListaTurnosScreen(userId: userId);
+    },
+  ),
   // Metricas
   GoRoute(
     path: '/admin/metricas',

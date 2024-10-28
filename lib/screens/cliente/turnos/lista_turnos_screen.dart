@@ -88,7 +88,7 @@ class _ListTurnView extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Turnos en Progreso',
+              'Turnos en progreso',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -99,7 +99,7 @@ class _ListTurnView extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Turnos Finalizados',
+              'Turnos finalizados',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),

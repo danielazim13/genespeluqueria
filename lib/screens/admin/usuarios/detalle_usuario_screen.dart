@@ -4,9 +4,7 @@ import 'package:app/entities/usuario.dart';
 
 class ProfileScreen extends StatefulWidget {
   final Usuario user;
-
   const ProfileScreen({super.key, required this.user});
-
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }

@@ -5,15 +5,15 @@ import 'package:intl/intl.dart';
 class ReprogramarTurnoScreen extends StatefulWidget {
   final String turnoId;
 
-  const ReprogramarTurnoScreen({Key? key, required this.turnoId}) : super(key: key);
+  const ReprogramarTurnoScreen ({Key? key, required this.turnoId}): super(key:key);
 
   @override
   _ReprogramarTurnoScreenState createState() => _ReprogramarTurnoScreenState();
 }
 
 class _ReprogramarTurnoScreenState extends State<ReprogramarTurnoScreen> {
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
+ DateTime selectedDate = DateTime.now();
+ TimeOfDay selectedTime = TimeOfDay.now();
 
 Future <void> _selectDate (BuildContext context) async{
   final DateTime? picked = await showDatePicker(
@@ -23,7 +23,7 @@ Future <void> _selectDate (BuildContext context) async{
     lastDate: DateTime.now().add(const Duration(days:365)),
     );
 
-    if (picked != null && picked != selectedDate) {
+    if(picked != null && picked != selectedDate){
       setState(() {
         selectedDate = picked;
       });
@@ -34,16 +34,15 @@ Future<void> _selectTime(BuildContext context) async {
     context: context,
     initialTime: selectedTime,
     );
-
-    if (picked != null && picked != selectedTime) {
+    if(picked !=null && picked !=selectedTime){
       setState(() {
         selectedTime = picked;
       });
     }
-  }
-
-  Future<void> _reprogramarTurno() async {
-    final DateTime ingreso = DateTime(
+}
+Future <void> _reprogramarTurno() async {
+  try {
+    final ingreso = DateTime(
       selectedDate.year,
       selectedDate.month,
       selectedDate.day,
@@ -65,33 +64,33 @@ Future<void> _selectTime(BuildContext context) async {
             child: Text('OK'),
             onPressed: ()=> Navigator.of(context).pop(),
             ),
-          ],
-        ),
+        ],
+      ),
       );
-    }
   }
+}
+@override
 
-  @override
-  Widget build(BuildContext context) {
+  Widget build (BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reprogramar turno'),
+        title: Text('Reprogramar turno'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              title: const Text('Seleccionar fecha'),
-              trailing: const Icon(Icons.calendar_today),
-              onTap: () => _selectDate(context),
+              title:Text('Seleccionar fecha'),
+              trailing: Icon(Icons.calendar_today),
+              onTap: ()=> _selectDate(context),
             ),
             Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
             const SizedBox(height: 16),
             ListTile(
-              title: const Text('Seleccionar hora'),
-              trailing: const Icon(Icons.access_time),
+              title: Text('Seleccionar hora'),
+              trailing: Icon(Icons.access_time),
               onTap: () => _selectTime(context),
             ),
             Text(selectedTime.format(context)),
@@ -105,8 +104,7 @@ Future<void> _selectTime(BuildContext context) async {
             ),
           ],
         ),
-      ),
+        ),
     );
   }
 }
-

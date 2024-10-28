@@ -100,45 +100,50 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
         mensaje: '',
       );
 
-    try {
-      // Genera la referencia del documento antes de guardar
-      DocumentReference docRef = FirebaseFirestore.instance.collection('turns').doc();
-      
-      // Guarda el turno con el ID generado manualmente
-      await docRef.set({
-        ...turno.toFirestore(),
-        'id': docRef.id, // Guarda el ID dentro del documento
-      });
+      try {
+        // Genera la referencia del documento antes de guardar
+        DocumentReference docRef =
+            FirebaseFirestore.instance.collection('turns').doc();
 
-      // Muestra un diálogo de confirmación
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Turno Solicitado'),
-          content: Text('Su turno ha sido solicitado con éxito.'),
-          actions: [
-            TextButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        ),
-      );
+        // Guarda el turno con el ID generado manualmente
+        await docRef.set({
+          ...turno.toFirestore(),
+          'id': docRef.id, // Guarda el ID dentro del documento
+        });
+
+        // Muestra un diálogo de confirmación
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Turno Solicitado'),
+            content: Text('Su turno ha sido solicitado con éxito.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      } catch (e) {
+        print('Error al guardar el turno: $e');
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Error'),
+            content: Text(
+                'Hubo un problema al solicitar el turno. Por favor, inténtelo de nuevo.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          ),
+        );
+      }
     } catch (e) {
-      print('Error al guardar el turno: $e');
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Hubo un problema al solicitar el turno. Por favor, inténtelo de nuevo.'),
-          actions: [
-            TextButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ],
-        ),
-      );
+      print('Error al obtener los datos del usuario: $e');
     }
   }
 

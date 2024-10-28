@@ -15,12 +15,12 @@ class _ReprogramarTurnoScreenState extends State<ReprogramarTurnoScreen> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
 
-Future <void> _selectDate (BuildContext context) async{
-  final DateTime? picked = await showDatePicker(
-    context: context,
-    initialDate: selectedDate,
-    firstDate: DateTime.now(),
-    lastDate: DateTime.now().add(const Duration(days:365)),
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
 
     if (picked != null && picked != selectedDate) {
@@ -28,11 +28,12 @@ Future <void> _selectDate (BuildContext context) async{
         selectedDate = picked;
       });
     }
-}
-Future<void> _selectTime(BuildContext context) async {
-  final TimeOfDay? picked = await showTimePicker(
-    context: context,
-    initialTime: selectedTime,
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: selectedTime,
     );
 
     if (picked != null && picked != selectedTime) {
@@ -43,27 +44,69 @@ Future<void> _selectTime(BuildContext context) async {
   }
 
   Future<void> _reprogramarTurno() async {
-    final DateTime ingreso = DateTime(
-      selectedDate.year,
-      selectedDate.month,
-      selectedDate.day,
-      selectedTime.hour,
-      selectedTime.minute,
-    );
-    await FirebaseFirestore.instance.collection('turns').doc(widget.turnoId).update({'ingreso': ingreso});
+    try {
+      final DateTime ingreso = DateTime(
+        selectedDate.year,
+        selectedDate.month,
+        selectedDate.day,
+        selectedTime.hour,
+        selectedTime.minute,
+      );
+      await FirebaseFirestore.instance
+          .collection('turns')
+          .doc(widget.turnoId)
+          .update({'ingreso': ingreso});
 
-    Navigator.of(context).pop();
-  } catch(e) {
-    print('Error al reprogramar el turno $e');
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Error'),
-        content: Text('No se pudo reprogramar el turno'),
-        actions: [
-          TextButton(
-            child: Text('OK'),
-            onPressed: ()=> Navigator.of(context).pop(),
+      Navigator.of(context).pop();
+    } catch (e) {
+      print('Error al reprogramar el turno: $e');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('No se pudo reprogramar el turno'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> _cancelarTurno() async {
+    try {
+      await FirebaseFirestore.instance.collection('turns').doc(widget.turnoId).delete();
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Turno cancelado'),
+          content: const Text('El turno ha sido cancelado exitosamente.'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop(); 
+              },
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      print('Error al cancelar el turno: $e');
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Error'),
+          content: const Text('No se pudo cancelar el turno'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         ),
@@ -100,8 +143,22 @@ Future<void> _selectTime(BuildContext context) async {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _reprogramarTurno,
-                child: Text('Confirmar repogramación'),
+                child: const Text('Confirmar reprogramación'),
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: _cancelarTurno,
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Theme.of(context).colorScheme.error),
                 ),
+                child: Text(
+                  'Cancelar turno',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
             ),
           ],
         ),
@@ -109,4 +166,3 @@ Future<void> _selectTime(BuildContext context) async {
     );
   }
 }
-

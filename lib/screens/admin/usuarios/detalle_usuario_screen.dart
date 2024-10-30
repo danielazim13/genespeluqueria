@@ -10,6 +10,23 @@ class ProfileScreen extends StatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
+Future<void> eliminarUsuario(BuildContext context) async {
+    try {
+      // Eliminar al usuario de Firestore
+      await FirebaseFirestore.instance
+          .collection('usuarios')
+          .doc(widget.usuario.id)
+          .delete();
+      // Regresar a la pantalla anterior
+      context.pop();
+    } catch (e) {
+      // Mostrar un mensaje de error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al eliminar al usuario: $e')),
+      );
+    }
+  }
+
 class _ProfileScreenState extends State<ProfileScreen> {
   late Usuario user;
   bool _isLoading = false;
@@ -148,10 +165,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () => _editUserInfo(context),
+                      icon: const Icon(Icons.delete),
+                      onPressed: () => eliminarUsuario(context),
                     ),
-                    IconButton(
-                                        icon: const Icon(Icons.delete),
-                                        onPressed: () async {
+                    //IconButton(
+                      //icon: const Icon(Icons.delete),
+                      //onPressed: () => eliminarUsuario(context),
+                                        /*onPressed: () async {
                                           bool? confirmDelete = await showDialog(
                                             context: context,
                                             builder: (context) => AlertDialog(
@@ -183,8 +203,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   _fetchUser();
                                             });
                                           }
-                                        }
-                  ),
+                                        }*/
+                  //),
+                ),
                 ),
                 const SizedBox(height: 16),
                 TextButton.icon(

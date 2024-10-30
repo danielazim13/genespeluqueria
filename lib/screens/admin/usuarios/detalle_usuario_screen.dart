@@ -140,6 +140,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void _deleteUserInfo(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Eliminar usuario'),
+        content: const Text('¿Estás seguro de que deseas eliminar este usuario?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              setState(() {
+                _isLoading = true;
+              });
+
+              try {
+                await FirebaseFirestore.instance
+                    .collection('usuarios')
+                    .doc(user.id)
+                    .delete();
+                Navigator.of(context).pop();
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error al eliminar el usuario: $e'),
+                  ),
+                );
+              } finally {
+                setState(() {
+                  _isLoading = false;
+                });
+              }
+            },
+            child: const Text('Eliminar'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,49 +206,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListTile(
                     title: Text('Nombre: ${user.nombre}'),
                     subtitle: Text('Teléfono: ${user.telefono}'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () => _editUserInfo(context),
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => eliminarUsuario(context),
-                    ),
-                    //IconButton(
-                      //icon: const Icon(Icons.delete),
-                      //onPressed: () => eliminarUsuario(context),
-                                        /*onPressed: () async {
-                                          bool? confirmDelete = await showDialog(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                              title: const Text(
-                                                  'Eliminar usuario'),
-                                              content: const Text(
-                                                  '¿Estás seguro que deseas eliminar al usuario?'),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(false),
-                                                  child: const Text('Cancelar'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.of(context)
-                                                          .pop(true),
-                                                  child: const Text('Eliminar'),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                          if (confirmDelete == true) {
-                                            await _deleteUsuario(
-                                                context, usuario.id);
-                                            setState(() {
-                                              _usuariosFuture =
-                                                  _fetchUser();
-                                            });
-                                          }
-                                        }*/
-                  //),
+                    trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _editUserInfo(context),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () => _deleteUserInfo(context),
+                      ),
+                    ],
+                ),
                 ),
                 ),
                 const SizedBox(height: 16),

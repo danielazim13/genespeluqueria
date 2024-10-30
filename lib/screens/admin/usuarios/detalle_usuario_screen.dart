@@ -149,6 +149,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: const Icon(Icons.edit),
                       onPressed: () => _editUserInfo(context),
                     ),
+                    IconButton(
+                                        icon: const Icon(Icons.delete),
+                                        onPressed: () async {
+                                          bool? confirmDelete = await showDialog(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text(
+                                                  'Eliminar usuario'),
+                                              content: const Text(
+                                                  '¿Estás seguro que deseas eliminar al usuario?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(false),
+                                                  child: const Text('Cancelar'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(true),
+                                                  child: const Text('Eliminar'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                          if (confirmDelete == true) {
+                                            await _deleteUsuario(
+                                                context, usuario.id);
+                                            setState(() {
+                                              _usuariosFuture =
+                                                  _fetchUser();
+                                            });
+                                          }
+                                        }
                   ),
                 ),
                 const SizedBox(height: 16),

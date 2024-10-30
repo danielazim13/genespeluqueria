@@ -10,7 +10,20 @@ class ProfileScreen extends StatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-Future<void> eliminarUsuario(BuildContext context) async {
+class _ProfileScreenState extends State<ProfileScreen> {
+  late Usuario user;
+  bool _isLoading = false;
+
+  String? _nameError;
+  String? _phoneError;
+
+  @override
+  void initState() {
+    super.initState();
+    user = widget.user;
+  }
+
+  Future<void> eliminarUsuario(BuildContext context) async {
     try {
       // Eliminar al usuario de Firestore
       await FirebaseFirestore.instance
@@ -25,19 +38,6 @@ Future<void> eliminarUsuario(BuildContext context) async {
         SnackBar(content: Text('Error al eliminar al usuario: $e')),
       );
     }
-  }
-
-class _ProfileScreenState extends State<ProfileScreen> {
-  late Usuario user;
-  bool _isLoading = false;
-
-  String? _nameError;
-  String? _phoneError;
-
-  @override
-  void initState() {
-    super.initState();
-    user = widget.user;
   }
 
   void _editUserInfo(BuildContext context) {
@@ -215,7 +215,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete),
-                        onPressed: () => _deleteUserInfo(context),
+                        onPressed: () async {
+                              // Mostrar diálogo de confirmación
+                              bool confirmacion = await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Confirmar eliminación'),
+                                    content: const Text(
+                                        '¿Estás seguro que deseas eliminar este usuario?'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                        child: const Text('Cancelar'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        child: const Text('Eliminar'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (confirmacion) {
+                                // ignore: use_build_context_synchronously
+                                await eliminarUsuario(context);
+                              }
+                            },
+                            child: const Text('Eliminar'),
                       ),
                     ],
                 ),

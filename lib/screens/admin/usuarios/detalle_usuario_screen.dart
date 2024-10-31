@@ -23,23 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     user = widget.user;
   }
 
-  Future<void> eliminarUsuario(BuildContext context) async {
-    try {
-      // Eliminar al usuario de Firestore
-      await FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(widget.usuario.id)
-          .delete();
-      // Regresar a la pantalla anterior
-      context.pop();
-    } catch (e) {
-      // Mostrar un mensaje de error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al eliminar al usuario: $e')),
-      );
-    }
-  }
-
   void _editUserInfo(BuildContext context) {
     final TextEditingController nameController =
         TextEditingController(text: user.nombre);
@@ -140,50 +123,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _deleteUserInfo(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Eliminar usuario'),
-        content: const Text('¿Estás seguro de que deseas eliminar este usuario?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () async {
-              setState(() {
-                _isLoading = true;
-              });
-
-              try {
-                await FirebaseFirestore.instance
-                    .collection('usuarios')
-                    .doc(user.id)
-                    .delete();
-                Navigator.of(context).pop();
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error al eliminar el usuario: $e'),
-                  ),
-                );
-              } finally {
-                setState(() {
-                  _isLoading = false;
-                });
-              }
-            },
-            child: const Text('Eliminar'),
-          ),
-        ],
-      );
-    },
-  );
-}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,52 +145,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListTile(
                     title: Text('Nombre: ${user.nombre}'),
                     subtitle: Text('Teléfono: ${user.telefono}'),
-                    trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () => _editUserInfo(context),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () async {
-                              // Mostrar diálogo de confirmación
-                              bool confirmacion = await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Confirmar eliminación'),
-                                    content: const Text(
-                                        '¿Estás seguro que deseas eliminar este usuario?'),
-                                    actions: <Widget>[
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                        child: const Text('Cancelar'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(true);
-                                        },
-                                        child: const Text('Eliminar'),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-
-                              if (confirmacion) {
-                                // ignore: use_build_context_synchronously
-                                await eliminarUsuario(context);
-                              }
-                            },
-                            child: const Text('Eliminar'),
-                      ),
-                    ],
-                ),
-                ),
+                    trailing: IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () => _editUserInfo(context),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
                 TextButton.icon(

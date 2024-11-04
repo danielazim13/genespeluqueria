@@ -1,214 +1,273 @@
-import 'package:app/entities/usuario.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:app/entities/peluquero.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:app/entities/servicio.dart';
-import 'package:app/entities/turno.dart';
+import 'package:go_router/go_router.dart';
+
+// entities
+import 'package:app/entities/vehicle.dart';
+import 'package:app/entities/service.dart';
+import 'package:app/entities/turn.dart';
+
+// widgets
+import 'package:app/widgets/spaced_column.dart';
+import 'package:app/widgets/vehicle_selector.dart';
+import 'package:app/widgets/service_selector.dart';
+import 'package:app/widgets/date_time_selector.dart';
+import 'package:app/widgets/message_form.dart';
 
 class SolicitarTurnoScreen extends StatefulWidget {
   const SolicitarTurnoScreen({super.key});
+
   @override
-  _SolicitarTurnoScreenState createState() => _SolicitarTurnoScreenState();
+  State<SolicitarTurnoScreen> createState() => _SolicitarTurnoScreenState();
 }
 
 class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
-  List<Servicio> services = [];
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
-  Map<String, bool> selectedServices = {};
-  double total = 0;
+  // State
+  Peluquero? _selectedPeluquero;
+  DateTime? _selectedDate;
+  String? _selectedHour;
+  Set<Service> _selectedServices = {};
+  String? _message;
 
+  // Data
+  List<Peluquero>? _peluqueros;
+  List<Service>? _services;
+
+  // Other
+  late Future<void> _initialLoadFuture;
+
+  Vehicle? _selectedVehicle;
+  List<Vehicle>? _vehicles;
+
+  // Lifecycle
+  // =========
   @override
   void initState() {
     super.initState();
-    _loadServices();
+    _initialLoadFuture = _loadInitialData();
   }
 
-  void _loadServices() async {
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection('servicios').get();
-    services = snapshot.docs.map((doc) => Servicio.fromFirestore(doc)).toList();
+  Future<void> _loadInitialData() async {
+    final vehiclesFuture = VehicleSelector.loadVehicles();
+    final servicesFuture = ServiceSelector.loadServices();
+    final results = await Future.wait([vehiclesFuture, servicesFuture]);
 
     setState(() {
-      for (var service in services) {
-        selectedServices[service.id] = false;
-      }
+      _vehicles = results[0] as List<Vehicle>;
+      _services = results[1] as List<Service>;
     });
   }
 
-  void _updateTotal() {
-    total = services
-        .where((service) => selectedServices[service.id] ?? false)
-        .fold(0, (sum, service) => sum + service.precio);
-    setState(() {});
-  }
+  // Fetches
+  // =======
+  Future<void> _submitTurn() async {
+    if (!_isSubmitEnabled()) return;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+    final hourParts = _selectedHour!.split(':');
+    final selectedHour = int.parse(hourParts[0]);
+    final selectedMinute = int.parse(hourParts[1]);
+
+    final DateTime ingreso = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      selectedHour,
+      selectedMinute,
     );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
-    );
-    if (picked != null && picked != selectedTime) {
-      setState(() {
-        selectedTime = picked;
-      });
-    }
-  }
+    final newTurn = Turn(
+        userId: FirebaseAuth.instance.currentUser?.uid ?? '',
+        vehicleId: _selectedVehicle!.id,
+        services: _selectedServices.map((service) => service.id).toList(),
+        ingreso: ingreso,
+        state: 'Pendiente',
+        totalPrice: _getSubtotal(),
+        egreso: await _getEgresoEstimado(ingreso),
+        message: _message ?? '');
 
-  void _solicitarTurno() async {
     try {
-      // Fetch the authenticated user's data from Firestore
-      final usuarioDoc = await FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(FirebaseAuth.instance.currentUser?.uid)
-          .get();
-      final usuario = Usuario.fromFirestore(usuarioDoc);
-
-      // Fetch full Servicio data for selected services
-      final selectedServicios = services
-          .where((service) => selectedServices[service.id] ?? false)
-          .toList();
-
-      // Create a Turn with full Usuario and Servicio data
-      final turno = Turn(
-        usuario: usuario,
-        servicios: selectedServicios,
-        ingreso: DateTime(
-          selectedDate.year,
-          selectedDate.month,
-          selectedDate.day,
-          selectedTime.hour,
-          selectedTime.minute,
+      await FirebaseFirestore.instance
+          .collection('turns')
+          .add(newTurn.toFirestore());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Turno creado exitosamente'),
         ),
-        estado: 'Pendiente',
-        precio: total,
-        mensaje: '',
       );
-
-      try {
-        // Genera la referencia del documento antes de guardar
-        DocumentReference docRef =
-            FirebaseFirestore.instance.collection('turns').doc();
-
-        // Guarda el turno con el ID generado manualmente
-        await docRef.set({
-          ...turno.toFirestore(),
-          'id': docRef.id, // Guarda el ID dentro del documento
-        });
-
-        // Muestra un diálogo de confirmación
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Turno Solicitado'),
-            content: Text('Su turno ha sido solicitado con éxito.'),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
-      } catch (e) {
-        print('Error al guardar el turno: $e');
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Error'),
-            content: Text(
-                'Hubo un problema al solicitar el turno. Por favor, inténtelo de nuevo.'),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
-      }
+      context.pop();
     } catch (e) {
-      print('Error al obtener los datos del usuario: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al crear turno'),
+        ),
+      );
     }
   }
 
+  Future<DateTime> _getEgresoEstimado(DateTime ingreso) async {
+    int totalDias = 0;
+
+    // Sumar los días aproximados de cada servicio seleccionado
+    for (var service in _selectedServices) {
+      totalDias += service.diasAproximados;
+    }
+
+    try {
+      // Recuperar la configuración de businessHours desde Firestore
+      DocumentSnapshot<Map<String, dynamic>> businessHoursSnapshot =
+          await FirebaseFirestore.instance
+              .collection('configuration')
+              .doc('businessHours')
+              .get();
+
+      Map<String, dynamic> businessHours =
+          businessHoursSnapshot.data() as Map<String, dynamic>;
+
+      DateTime egresoEstimado = ingreso;
+      int diasAgregados = 0;
+
+      // Agregar días hábiles hasta alcanzar el total de días
+      while (diasAgregados < totalDias) {
+        egresoEstimado = egresoEstimado.add(const Duration(days: 1));
+
+        // Obtener el nombre del día de la semana en inglés
+        String diaSemana = _getWeekdayName(egresoEstimado.weekday);
+
+        // Verificar si el día es hábil
+        if (businessHours[diaSemana]['open'] == true) {
+          diasAgregados++;
+        }
+      }
+
+      return egresoEstimado;
+    } catch (error) {
+      print("Error al obtener la configuración de businessHours: $error");
+      // Manejar el error de alguna manera apropiada
+      // Por ejemplo, devolver la fecha de egreso estimada sin considerar los días hábiles
+      return ingreso.add(Duration(days: totalDias));
+    }
+  }
+
+  // Build
+  // =====
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Solicitar turno'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+    return FutureBuilder<void>(
+      future: _initialLoadFuture,
+      builder: (context, snapshot) {
+        Widget bodyWidget;
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          bodyWidget = const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          bodyWidget = const Center(child: Text('Error al cargar los datos'));
+        } else {
+          bodyWidget = _buildMainContent();
+        }
+
+        return Scaffold(
+          appBar: AppBar(title: const Text('Solicitar turno')),
+          body: bodyWidget,
+        );
+      },
+    );
+  }
+
+  Widget _buildMainContent() {
+    return SpacedColumn(
+      children: [
+        DateTimeSelector(
+          onDateSelected: (x) => setState(() => _selectedDate = x),
+          onTimeSelected: (x) => setState(() => _selectedHour = x),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                title: Text('Seleccionar fecha'),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () => _selectDate(context),
-              ),
-              Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
-              SizedBox(height: 16),
-              ListTile(
-                title: Text('Seleccionar hora'),
-                trailing: Icon(Icons.access_time),
-                onTap: () => _selectTime(context),
-              ),
-              Text(selectedTime.format(context)),
-              SizedBox(height: 16),
-              Text('Seleccionar servicios',
-                  style: Theme.of(context).textTheme.titleMedium),
-              ...services.map((service) => CheckboxListTile(
-                    title: Text(service.nombre),
-                    subtitle: Text('\$${service.precio.toStringAsFixed(2)}'),
-                    value: selectedServices[service.id] ?? false,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        selectedServices[service.id] = value ?? false;
-                        _updateTotal();
-                      });
-                    },
-                  )),
-              SizedBox(height: 16),
-              Text('Total: \$${total.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.titleLarge),
-              SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _solicitarTurno,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text('Solicitar'),
-                ),
-              ),
-            ],
+        VehicleSelector(
+          vehicles: _vehicles!,
+          onVehicleSelected: (x) => setState(() => _selectedVehicle = x),
+        ),
+        ServiceSelector(
+          services: _services!,
+          onServicesSelected: (x) => setState(() => _selectedServices = x),
+        ),
+        MessageForm(
+          onMessageChanged: (x) => setState(() => _message = x),
+        ),
+        _buildSubtotal(),
+        _buildSubmitButton(),
+      ],
+    );
+  }
+
+  Widget _buildSubtotal() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Precio: \$${_getSubtotal().toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
-        ),
+          Text(
+            'Duración: ${_getDiasAproximados().toStringAsFixed(0)} ${_getDiasAproximados() == 1 ? 'día hábil' : 'días hábiles'}',
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildSubmitButton() {
+    return ElevatedButton(
+      onPressed: _isSubmitEnabled() ? _submitTurn : null,
+      child: const Text('Solicitar'),
+    );
+  }
+
+  // Helpers
+  // =======
+  bool _isSubmitEnabled() {
+    bool isVehicleSelected = _selectedVehicle != null;
+    bool isServiceSelected = _selectedServices.isNotEmpty;
+    bool isDateSelected = _selectedDate != null;
+    bool isHourSelected = _selectedHour != null;
+
+    return isVehicleSelected &&
+        isServiceSelected &&
+        isDateSelected &&
+        isHourSelected;
+  }
+
+  double _getSubtotal() {
+    return _selectedServices.fold(
+        0.0, (total, service) => total + service.price);
+  }
+
+  double _getDiasAproximados() {
+    return _selectedServices.fold(
+        0.0, (total, service) => total + service.diasAproximados);
+  }
+
+  // Método para obtener el nombre del día de la semana en inglés
+  String _getWeekdayName(int weekday) {
+    switch (weekday) {
+      case DateTime.monday:
+        return 'Monday';
+      case DateTime.tuesday:
+        return 'Tuesday';
+      case DateTime.wednesday:
+        return 'Wednesday';
+      case DateTime.thursday:
+        return 'Thursday';
+      case DateTime.friday:
+        return 'Friday';
+      case DateTime.saturday:
+        return 'Saturday';
+      case DateTime.sunday:
+        return 'Sunday';
+      default:
+        return '';
+    }
   }
 }

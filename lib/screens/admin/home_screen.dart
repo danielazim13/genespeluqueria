@@ -20,9 +20,14 @@ class AdminHomeScreen extends StatelessWidget {
           route: '/admin/usuarios',
           icon: Icons.group,
         ),
-         NavigationButton(
+        NavigationButton(
           text: 'Metricas',
           route: '/admin/metricas',
+          icon: Icons.bar_chart,
+        ),
+        NavigationButton(
+          text: 'Metricas Charts',
+          route: '/admin/metricas-charts',
           icon: Icons.bar_chart,
         ),
         NavigationButton(
@@ -30,7 +35,7 @@ class AdminHomeScreen extends StatelessWidget {
           text: 'Servicios',
           route: '/admin/servicios/lista',
         ),
-         NavigationButton(
+        NavigationButton(
           text: 'Horario de atención',
           route: '/admin/config/business-hours',
           icon: Icons.access_time,

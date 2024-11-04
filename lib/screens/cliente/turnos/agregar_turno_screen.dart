@@ -1,22 +1,19 @@
-import 'package:app/entities/peluquero.dart';
-import 'package:app/entities/servicio.dart';
-import 'package:app/widgets/peluquero_selector.dart';
-import 'package:app/widgets/servicio_selector.dart';
+import 'package:app/entities/usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 // entities
-import 'package:app/entities/vehicle.dart';
-import 'package:app/entities/service.dart';
-import 'package:app/entities/turn.dart';
+import 'package:app/entities/peluquero.dart';
+import 'package:app/entities/servicio.dart';
+import 'package:app/entities/turno.dart';
 
 // widgets
 import 'package:app/widgets/spaced_column.dart';
-import 'package:app/widgets/vehicle_selector.dart';
-import 'package:app/widgets/service_selector.dart';
 import 'package:app/widgets/date_time_selector.dart';
+import 'package:app/widgets/servicio_selector.dart';
+import 'package:app/widgets/peluquero_selector.dart';
 import 'package:app/widgets/message_form.dart';
 
 class SolicitarTurnoScreen extends StatefulWidget {
@@ -40,9 +37,6 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
 
   // Other
   late Future<void> _initialLoadFuture;
-
-  Vehicle? _selectedVehicle;
-  List<Vehicle>? _vehicles;
 
   // Lifecycle
   // =========
@@ -80,15 +74,20 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
       selectedMinute,
     );
 
+    final usuarioDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .get();
+    final usuario = Usuario.fromFirestore(usuarioDoc);
+
     final newTurn = Turn(
-        userId: FirebaseAuth.instance.currentUser?.uid ?? '',
-        vehicleId: _selectedVehicle!.id,
-        services: _selectedServicios.map((service) => service.id).toList(),
-        ingreso: ingreso,
-        state: 'Pendiente',
-        totalPrice: _getSubtotal(),
-        egreso: await _getEgresoEstimado(ingreso),
-        message: _message ?? '');
+      usuario: usuario,
+      servicios: _selectedServicios.toList(),
+      ingreso: ingreso,
+      estado: 'Pendiente',
+      precio: _getSubtotal(),
+      mensaje: _message ?? '',
+    );
 
     try {
       await FirebaseFirestore.instance
@@ -99,6 +98,8 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
           content: Text('Turno creado exitosamente'),
         ),
       );
+      // For firebase database filtering
+      print(FirebaseAuth.instance.currentUser?.uid);
       context.pop();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -106,50 +107,6 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
           content: Text('Error al crear turno'),
         ),
       );
-    }
-  }
-
-  Future<DateTime> _getEgresoEstimado(DateTime ingreso) async {
-    int totalDias = 0;
-
-    // Sumar los días aproximados de cada servicio seleccionado
-    for (var service in _selectedServicios) {
-      totalDias += service.duracion;
-    }
-
-    try {
-      // Recuperar la configuración de businessHours desde Firestore
-      DocumentSnapshot<Map<String, dynamic>> businessHoursSnapshot =
-          await FirebaseFirestore.instance
-              .collection('configuration')
-              .doc('businessHours')
-              .get();
-
-      Map<String, dynamic> businessHours =
-          businessHoursSnapshot.data() as Map<String, dynamic>;
-
-      DateTime egresoEstimado = ingreso;
-      int diasAgregados = 0;
-
-      // Agregar días hábiles hasta alcanzar el total de días
-      while (diasAgregados < totalDias) {
-        egresoEstimado = egresoEstimado.add(const Duration(days: 1));
-
-        // Obtener el nombre del día de la semana en inglés
-        String diaSemana = _getWeekdayName(egresoEstimado.weekday);
-
-        // Verificar si el día es hábil
-        if (businessHours[diaSemana]['open'] == true) {
-          diasAgregados++;
-        }
-      }
-
-      return egresoEstimado;
-    } catch (error) {
-      print("Error al obtener la configuración de businessHours: $error");
-      // Manejar el error de alguna manera apropiada
-      // Por ejemplo, devolver la fecha de egreso estimada sin considerar los días hábiles
-      return ingreso.add(Duration(days: totalDias));
     }
   }
 
@@ -189,10 +146,10 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
           servicios: _servicios!,
           onServiciosSelected: (x) => setState(() => _selectedServicios = x),
         ),
-        PeluqueroSelector(
-          peluqueros: _peluqueros!,
-          onPeluqueroSelected: (x) => setState(() => _selectedPeluquero = x),
-        ),
+        // PeluqueroSelector(
+        //   peluqueros: _peluqueros!,
+        //   onPeluqueroSelected: (x) => setState(() => _selectedPeluquero = x),
+        // ),
         MessageForm(
           onMessageChanged: (x) => setState(() => _message = x),
         ),
@@ -204,7 +161,7 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
 
   Widget _buildSubtotal() {
     final subtotal = _getSubtotal();
-    final diasAproximados = _getDiasAproximados();
+    final minutes = _getMinutes();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -216,9 +173,7 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
             style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
           Text(
-            diasAproximados == 0
-                ? ''
-                : '⌚: ${diasAproximados.toStringAsFixed(0)}\'',
+            minutes == 0 ? '' : '⌚: ${minutes.toStringAsFixed(0)}\'',
             style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
         ],
@@ -236,15 +191,11 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   // Helpers
   // =======
   bool _isSubmitEnabled() {
-    bool isVehicleSelected = _selectedVehicle != null;
     bool isServicioSelected = _selectedServicios.isNotEmpty;
     bool isDateSelected = _selectedDate != null;
     bool isHourSelected = _selectedHour != null;
 
-    return isVehicleSelected &&
-        isServicioSelected &&
-        isDateSelected &&
-        isHourSelected;
+    return isServicioSelected && isDateSelected && isHourSelected;
   }
 
   double _getSubtotal() {
@@ -252,30 +203,8 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
         0.0, (total, service) => total + service.precio);
   }
 
-  double _getDiasAproximados() {
+  double _getMinutes() {
     return _selectedServicios.fold(
         0.0, (total, service) => total + service.duracion);
-  }
-
-  // Método para obtener el nombre del día de la semana en inglés
-  String _getWeekdayName(int weekday) {
-    switch (weekday) {
-      case DateTime.monday:
-        return 'Monday';
-      case DateTime.tuesday:
-        return 'Tuesday';
-      case DateTime.wednesday:
-        return 'Wednesday';
-      case DateTime.thursday:
-        return 'Thursday';
-      case DateTime.friday:
-        return 'Friday';
-      case DateTime.saturday:
-        return 'Saturday';
-      case DateTime.sunday:
-        return 'Sunday';
-      default:
-        return '';
-    }
   }
 }

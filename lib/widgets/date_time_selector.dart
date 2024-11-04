@@ -351,7 +351,7 @@ Future<void> _createDefaultBusinessHours() async {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              title: const Text('Horas de negocio'),
+              title: const Text('Horario de atención'),
               trailing: const Icon(Icons.store),
               onTap: () {
                 _showBusinessHoursDialog(context);

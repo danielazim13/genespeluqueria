@@ -1,20 +1,20 @@
-import 'package:app/entities/usuario.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 
 // entities
+import 'package:app/entities/usuario.dart';
 import 'package:app/entities/peluquero.dart';
 import 'package:app/entities/servicio.dart';
 import 'package:app/entities/turno.dart';
 
 // widgets
 import 'package:app/widgets/spaced_column.dart';
-import 'package:app/widgets/date_time_selector.dart';
-import 'package:app/widgets/servicio_selector.dart';
-import 'package:app/widgets/peluquero_selector.dart';
-import 'package:app/widgets/message_form.dart';
+import 'package:app/widgets/agregar_turno/date_time_selector.dart';
+import 'package:app/widgets/agregar_turno/servicio_selector.dart';
+import 'package:app/widgets/agregar_turno/peluquero_selector.dart';
+import 'package:app/widgets/agregar_turno/message_form.dart';
 
 class SolicitarTurnoScreen extends StatefulWidget {
   const SolicitarTurnoScreen({super.key});

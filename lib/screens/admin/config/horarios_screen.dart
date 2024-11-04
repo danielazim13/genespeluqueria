@@ -194,7 +194,7 @@ class _BusinessHoursScreenState extends State<BusinessHoursScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Horas de negocio'),
+        title: const Text('Horario de atención'),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

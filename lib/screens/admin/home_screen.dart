@@ -31,7 +31,7 @@ class AdminHomeScreen extends StatelessWidget {
           route: '/admin/servicios/lista',
         ),
          NavigationButton(
-          text: 'Horas de negocio',
+          text: 'Horario de atención',
           route: '/admin/config/business-hours',
           icon: Icons.access_time,
         ),

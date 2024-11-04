@@ -1,214 +1,210 @@
-import 'package:app/entities/usuario.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
+
+// entities
+import 'package:app/entities/usuario.dart';
+import 'package:app/entities/peluquero.dart';
 import 'package:app/entities/servicio.dart';
 import 'package:app/entities/turno.dart';
 
+// widgets
+import 'package:app/widgets/spaced_column.dart';
+import 'package:app/widgets/agregar_turno/date_time_selector.dart';
+import 'package:app/widgets/agregar_turno/servicio_selector.dart';
+import 'package:app/widgets/agregar_turno/peluquero_selector.dart';
+import 'package:app/widgets/agregar_turno/message_form.dart';
+
 class SolicitarTurnoScreen extends StatefulWidget {
   const SolicitarTurnoScreen({super.key});
+
   @override
-  _SolicitarTurnoScreenState createState() => _SolicitarTurnoScreenState();
+  State<SolicitarTurnoScreen> createState() => _SolicitarTurnoScreenState();
 }
 
 class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
-  List<Servicio> services = [];
-  DateTime selectedDate = DateTime.now();
-  TimeOfDay selectedTime = TimeOfDay.now();
-  Map<String, bool> selectedServices = {};
-  double total = 0;
+  // State
+  Peluquero? _selectedPeluquero;
+  DateTime? _selectedDate;
+  String? _selectedHour;
+  Set<Servicio> _selectedServicios = {};
+  String? _message;
 
+  // Data
+  List<Peluquero>? _peluqueros;
+  List<Servicio>? _servicios;
+
+  // Other
+  late Future<void> _initialLoadFuture;
+
+  // Lifecycle
+  // =========
   @override
   void initState() {
     super.initState();
-    _loadServices();
+    _initialLoadFuture = _loadInitialData();
   }
 
-  void _loadServices() async {
-    QuerySnapshot snapshot =
-        await FirebaseFirestore.instance.collection('servicios').get();
-    services = snapshot.docs.map((doc) => Servicio.fromFirestore(doc)).toList();
+  Future<void> _loadInitialData() async {
+    final peluquerosFuture = PeluqueroSelector.loadPeluqueros();
+    final servicesFuture = ServicioSelector.loadServicios();
+    final results = await Future.wait([peluquerosFuture, servicesFuture]);
 
     setState(() {
-      for (var service in services) {
-        selectedServices[service.id] = false;
-      }
+      _peluqueros = results[0] as List<Peluquero>;
+      _servicios = results[1] as List<Servicio>;
     });
   }
 
-  void _updateTotal() {
-    total = services
-        .where((service) => selectedServices[service.id] ?? false)
-        .fold(0, (sum, service) => sum + service.precio);
-    setState(() {});
-  }
+  // Fetches
+  // =======
+  Future<void> _submitTurn() async {
+    if (!_isSubmitEnabled()) return;
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+    final hourParts = _selectedHour!.split(':');
+    final selectedHour = int.parse(hourParts[0]);
+    final selectedMinute = int.parse(hourParts[1]);
+
+    final DateTime ingreso = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      selectedHour,
+      selectedMinute,
     );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
 
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
+    final usuarioDoc = await FirebaseFirestore.instance
+        .collection('usuarios')
+        .doc(FirebaseAuth.instance.currentUser?.uid)
+        .get();
+    final usuario = Usuario.fromFirestore(usuarioDoc);
+
+    final newTurn = Turn(
+      usuario: usuario,
+      servicios: _selectedServicios.toList(),
+      ingreso: ingreso,
+      estado: 'Pendiente',
+      precio: _getSubtotal(),
+      mensaje: _message ?? '',
     );
-    if (picked != null && picked != selectedTime) {
-      setState(() {
-        selectedTime = picked;
-      });
-    }
-  }
 
-  void _solicitarTurno() async {
     try {
-      // Fetch the authenticated user's data from Firestore
-      final usuarioDoc = await FirebaseFirestore.instance
-          .collection('usuarios')
-          .doc(FirebaseAuth.instance.currentUser?.uid)
-          .get();
-      final usuario = Usuario.fromFirestore(usuarioDoc);
-
-      // Fetch full Servicio data for selected services
-      final selectedServicios = services
-          .where((service) => selectedServices[service.id] ?? false)
-          .toList();
-
-      // Create a Turn with full Usuario and Servicio data
-      final turno = Turn(
-        usuario: usuario,
-        servicios: selectedServicios,
-        ingreso: DateTime(
-          selectedDate.year,
-          selectedDate.month,
-          selectedDate.day,
-          selectedTime.hour,
-          selectedTime.minute,
+      await FirebaseFirestore.instance
+          .collection('turns')
+          .add(newTurn.toFirestore());
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Turno creado exitosamente'),
         ),
-        estado: 'Pendiente',
-        precio: total,
-        mensaje: '',
       );
-
-      try {
-        // Genera la referencia del documento antes de guardar
-        DocumentReference docRef =
-            FirebaseFirestore.instance.collection('turns').doc();
-
-        // Guarda el turno con el ID generado manualmente
-        await docRef.set({
-          ...turno.toFirestore(),
-          'id': docRef.id, // Guarda el ID dentro del documento
-        });
-
-        // Muestra un diálogo de confirmación
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Turno Solicitado'),
-            content: Text('Su turno ha sido solicitado con éxito.'),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
-      } catch (e) {
-        print('Error al guardar el turno: $e');
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Error'),
-            content: Text(
-                'Hubo un problema al solicitar el turno. Por favor, inténtelo de nuevo.'),
-            actions: [
-              TextButton(
-                child: Text('OK'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          ),
-        );
-      }
+      // For firebase database filtering
+      print(FirebaseAuth.instance.currentUser?.uid);
+      context.pop();
     } catch (e) {
-      print('Error al obtener los datos del usuario: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error al crear turno'),
+        ),
+      );
     }
   }
 
+  // Build
+  // =====
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Solicitar turno'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+    return FutureBuilder<void>(
+      future: _initialLoadFuture,
+      builder: (context, snapshot) {
+        Widget bodyWidget;
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          bodyWidget = const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          bodyWidget = const Center(child: Text('Error al cargar los datos'));
+        } else {
+          bodyWidget = _buildMainContent();
+        }
+
+        return Scaffold(
+          appBar: AppBar(title: const Text('Solicitar turno')),
+          body: bodyWidget,
+        );
+      },
+    );
+  }
+
+  Widget _buildMainContent() {
+    return SpacedColumn(
+      children: [
+        DateTimeSelector(
+          onDateSelected: (x) => setState(() => _selectedDate = x),
+          onTimeSelected: (x) => setState(() => _selectedHour = x),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                title: Text('Seleccionar fecha'),
-                trailing: Icon(Icons.calendar_today),
-                onTap: () => _selectDate(context),
-              ),
-              Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
-              SizedBox(height: 16),
-              ListTile(
-                title: Text('Seleccionar hora'),
-                trailing: Icon(Icons.access_time),
-                onTap: () => _selectTime(context),
-              ),
-              Text(selectedTime.format(context)),
-              SizedBox(height: 16),
-              Text('Seleccionar servicios',
-                  style: Theme.of(context).textTheme.titleMedium),
-              ...services.map((service) => CheckboxListTile(
-                    title: Text(service.nombre),
-                    subtitle: Text('\$${service.precio.toStringAsFixed(2)}'),
-                    value: selectedServices[service.id] ?? false,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        selectedServices[service.id] = value ?? false;
-                        _updateTotal();
-                      });
-                    },
-                  )),
-              SizedBox(height: 16),
-              Text('Total: \$${total.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.titleLarge),
-              SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _solicitarTurno,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  child: Text('Solicitar'),
-                ),
-              ),
-            ],
+        ServicioSelector(
+          servicios: _servicios!,
+          onServiciosSelected: (x) => setState(() => _selectedServicios = x),
+        ),
+        // PeluqueroSelector(
+        //   peluqueros: _peluqueros!,
+        //   onPeluqueroSelected: (x) => setState(() => _selectedPeluquero = x),
+        // ),
+        MessageForm(
+          onMessageChanged: (x) => setState(() => _message = x),
+        ),
+        _buildSubtotal(),
+        _buildSubmitButton(),
+      ],
+    );
+  }
+
+  Widget _buildSubtotal() {
+    final subtotal = _getSubtotal();
+    final minutes = _getMinutes();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            subtotal == 0 ? '' : '💲: ${subtotal.toStringAsFixed(0)}',
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
-        ),
+          Text(
+            minutes == 0 ? '' : '⌚: ${minutes.toStringAsFixed(0)}\'',
+            style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
+  }
+
+  Widget _buildSubmitButton() {
+    return ElevatedButton(
+      onPressed: _isSubmitEnabled() ? _submitTurn : null,
+      child: const Text('Solicitar'),
+    );
+  }
+
+  // Helpers
+  // =======
+  bool _isSubmitEnabled() {
+    bool isServicioSelected = _selectedServicios.isNotEmpty;
+    bool isDateSelected = _selectedDate != null;
+    bool isHourSelected = _selectedHour != null;
+
+    return isServicioSelected && isDateSelected && isHourSelected;
+  }
+
+  double _getSubtotal() {
+    return _selectedServicios.fold(
+        0.0, (total, service) => total + service.precio);
+  }
+
+  double _getMinutes() {
+    return _selectedServicios.fold(
+        0.0, (total, service) => total + service.duracion);
   }
 }

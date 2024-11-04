@@ -345,7 +345,7 @@ Future<void> _createDefaultBusinessHours() async {
         'Seleccionar hora y fecha',
         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
       ),
-      initiallyExpanded: true,
+      initiallyExpanded: false,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -39,7 +39,7 @@ class _VehicleSelectorState extends State<VehicleSelector> {
         'Seleccionar vehículo',
         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
       ),
-      initiallyExpanded: true,
+      initiallyExpanded: false,
       children: widget.vehicles.map((vehicle) {
         return RadioListTile<Vehicle>(
           title: Text('${vehicle.brand} ${vehicle.model}'),

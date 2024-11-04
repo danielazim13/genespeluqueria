@@ -1,4 +1,7 @@
 import 'package:app/entities/peluquero.dart';
+import 'package:app/entities/servicio.dart';
+import 'package:app/widgets/peluquero_selector.dart';
+import 'package:app/widgets/servicio_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -28,12 +31,12 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   Peluquero? _selectedPeluquero;
   DateTime? _selectedDate;
   String? _selectedHour;
-  Set<Service> _selectedServices = {};
+  Set<Servicio> _selectedServicios = {};
   String? _message;
 
   // Data
   List<Peluquero>? _peluqueros;
-  List<Service>? _services;
+  List<Servicio>? _servicios;
 
   // Other
   late Future<void> _initialLoadFuture;
@@ -50,13 +53,13 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   }
 
   Future<void> _loadInitialData() async {
-    final vehiclesFuture = VehicleSelector.loadVehicles();
-    final servicesFuture = ServiceSelector.loadServices();
-    final results = await Future.wait([vehiclesFuture, servicesFuture]);
+    final peluquerosFuture = PeluqueroSelector.loadPeluqueros();
+    final servicesFuture = ServicioSelector.loadServicios();
+    final results = await Future.wait([peluquerosFuture, servicesFuture]);
 
     setState(() {
-      _vehicles = results[0] as List<Vehicle>;
-      _services = results[1] as List<Service>;
+      _peluqueros = results[0] as List<Peluquero>;
+      _servicios = results[1] as List<Servicio>;
     });
   }
 
@@ -80,7 +83,7 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
     final newTurn = Turn(
         userId: FirebaseAuth.instance.currentUser?.uid ?? '',
         vehicleId: _selectedVehicle!.id,
-        services: _selectedServices.map((service) => service.id).toList(),
+        services: _selectedServicios.map((service) => service.id).toList(),
         ingreso: ingreso,
         state: 'Pendiente',
         totalPrice: _getSubtotal(),
@@ -110,8 +113,8 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
     int totalDias = 0;
 
     // Sumar los días aproximados de cada servicio seleccionado
-    for (var service in _selectedServices) {
-      totalDias += service.diasAproximados;
+    for (var service in _selectedServicios) {
+      totalDias += service.duracion;
     }
 
     try {
@@ -182,13 +185,13 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
           onDateSelected: (x) => setState(() => _selectedDate = x),
           onTimeSelected: (x) => setState(() => _selectedHour = x),
         ),
-        VehicleSelector(
-          vehicles: _vehicles!,
-          onVehicleSelected: (x) => setState(() => _selectedVehicle = x),
+        ServicioSelector(
+          servicios: _servicios!,
+          onServiciosSelected: (x) => setState(() => _selectedServicios = x),
         ),
-        ServiceSelector(
-          services: _services!,
-          onServicesSelected: (x) => setState(() => _selectedServices = x),
+        PeluqueroSelector(
+          peluqueros: _peluqueros!,
+          onPeluqueroSelected: (x) => setState(() => _selectedPeluquero = x),
         ),
         MessageForm(
           onMessageChanged: (x) => setState(() => _message = x),
@@ -200,17 +203,22 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   }
 
   Widget _buildSubtotal() {
+    final subtotal = _getSubtotal();
+    final diasAproximados = _getDiasAproximados();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Precio: \$${_getSubtotal().toStringAsFixed(2)}',
+            subtotal == 0 ? '' : '💲: ${subtotal.toStringAsFixed(0)}',
             style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
           Text(
-            'Duración: ${_getDiasAproximados().toStringAsFixed(0)} ${_getDiasAproximados() == 1 ? 'día hábil' : 'días hábiles'}',
+            diasAproximados == 0
+                ? ''
+                : '⌚: ${diasAproximados.toStringAsFixed(0)}\'',
             style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
           ),
         ],
@@ -229,24 +237,24 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   // =======
   bool _isSubmitEnabled() {
     bool isVehicleSelected = _selectedVehicle != null;
-    bool isServiceSelected = _selectedServices.isNotEmpty;
+    bool isServicioSelected = _selectedServicios.isNotEmpty;
     bool isDateSelected = _selectedDate != null;
     bool isHourSelected = _selectedHour != null;
 
     return isVehicleSelected &&
-        isServiceSelected &&
+        isServicioSelected &&
         isDateSelected &&
         isHourSelected;
   }
 
   double _getSubtotal() {
-    return _selectedServices.fold(
-        0.0, (total, service) => total + service.price);
+    return _selectedServicios.fold(
+        0.0, (total, service) => total + service.precio);
   }
 
   double _getDiasAproximados() {
-    return _selectedServices.fold(
-        0.0, (total, service) => total + service.diasAproximados);
+    return _selectedServicios.fold(
+        0.0, (total, service) => total + service.duracion);
   }
 
   // Método para obtener el nombre del día de la semana en inglés

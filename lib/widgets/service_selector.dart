@@ -52,7 +52,7 @@ class _ServiceSelectorState extends State<ServiceSelector> {
               'Seleccionar servicios',
               style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
-            initiallyExpanded: true,
+            initiallyExpanded: false,
             children: widget.services.map((service) {
               return CheckboxListTile(
                 title: Row(

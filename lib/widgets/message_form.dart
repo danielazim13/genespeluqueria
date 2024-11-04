@@ -29,7 +29,7 @@ class _MessageFormState extends State<MessageForm> {
         'Agregar mensaje (opcional)',
         style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
       ),
-      initiallyExpanded: true,
+      initiallyExpanded: false,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),

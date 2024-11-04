@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class MetricasScreen extends StatelessWidget {
+class MetricasScreen extends StatefulWidget {
   const MetricasScreen({super.key});
 
-  Future<Map<String, dynamic>> obtenerDatos() async {
+  @override
+  _MetricasScreenState createState() => _MetricasScreenState();
+}
+
+class _MetricasScreenState extends State<MetricasScreen> {
+  DateTimeRange? _selectedDateRange;
+
+  Future<Map<String, dynamic>> obtenerDatos({DateTimeRange? dateRange}) async {
     try {
       QuerySnapshot turnosSnapshot =
           await FirebaseFirestore.instance.collection('turns').get();
@@ -18,28 +25,41 @@ class MetricasScreen extends StatelessWidget {
       }
 
       // Mapear turnos
-      List<Map<String, dynamic>> turnosMapeados = turnosSnapshot.docs.map((turnoDoc) {
-        final turnoData = turnoDoc.data() as Map<String, dynamic>;
+      List<Map<String, dynamic>> turnosMapeados = turnosSnapshot.docs
+          .map((turnoDoc) {
+            final turnoData = turnoDoc.data() as Map<String, dynamic>;
 
-        List<String> nombresServicios = [];
-        for (var idServicio in (turnoData['servicios'] as List)) {
-          if (idToName.containsKey(idServicio)) {
-            nombresServicios.add(idToName[idServicio]!);
-          }
-        }
+            List<String> nombresServicios = [];
+            for (var idServicio in (turnoData['servicios'] as List)) {
+              if (idToName.containsKey(idServicio)) {
+                nombresServicios.add(idToName[idServicio]!);
+              }
+            }
 
-        return {
-          'id': turnoDoc.id,
-          'ingreso': turnoData.containsKey('ingreso')
-              ? (turnoData['ingreso'] as Timestamp).toDate()
-              : null,
-          'estado': turnoData['estado'] ?? '',
-          'precio': (turnoData['precio'] ?? 0).toDouble(),
-          'services': nombresServicios,
-        };
-      }).toList();
+            DateTime? ingreso = turnoData.containsKey('ingreso')
+                ? (turnoData['ingreso'] as Timestamp).toDate()
+                : null;
 
-      print(turnosMapeados);
+            // Filtrar por rango de fechas si se especifica
+            if (dateRange != null && ingreso != null) {
+              if (ingreso.isBefore(dateRange.start) ||
+                  ingreso.isAfter(dateRange.end)) {
+                return null;
+              }
+            }
+
+            return {
+              'id': turnoDoc.id,
+              'ingreso': ingreso,
+              'estado': turnoData['estado'] ?? '',
+              'precio': (turnoData['precio'] ?? 0).toDouble(),
+              'services': nombresServicios,
+            };
+          })
+          .where((turno) => turno != null)
+          .cast<Map<String, dynamic>>()
+          .toList();
+
       return {
         'turnos': turnosMapeados,
       };
@@ -50,14 +70,33 @@ class MetricasScreen extends StatelessWidget {
     }
   }
 
+  void _pickDateRange() async {
+    DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2023),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _selectedDateRange) {
+      setState(() {
+        _selectedDateRange = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Métricas'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: _pickDateRange,
+          ),
+        ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: obtenerDatos(),
+        future: obtenerDatos(dateRange: _selectedDateRange),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -78,14 +117,30 @@ class MetricasScreen extends StatelessWidget {
                 icon: Icons.event,
                 title: 'Turnos',
                 metrics: [
-                  {'label': 'Total de Turnos', 'value': turnos.length.toString()},
+                  {
+                    'label': 'Total de Turnos',
+                    'value': turnos.length.toString()
+                  },
+                  {
+                    'label': 'Turnos Pendientes',
+                    'value': turnos
+                        .where((t) => t['estado'] == 'Pendiente')
+                        .length
+                        .toString()
+                  },
                   {
                     'label': 'Turnos Confirmados',
-                    'value': turnos.where((t) => t['estado'] == 'Confirmado').length.toString()
+                    'value': turnos
+                        .where((t) => t['estado'] == 'Confirmado')
+                        .length
+                        .toString()
                   },
                   {
                     'label': 'Turnos Realizados',
-                    'value': turnos.where((t) => t['estado'] == 'Realizado').length.toString()
+                    'value': turnos
+                        .where((t) => t['estado'] == 'Realizado')
+                        .length
+                        .toString()
                   },
                 ],
               ),
@@ -98,7 +153,8 @@ class MetricasScreen extends StatelessWidget {
                 metrics: [
                   {
                     'label': 'Total de Ingresos',
-                    'value': '\$${turnos.fold(0.0, (sum, turno) => sum + turno['precio']).toStringAsFixed(2)}'
+                    'value':
+                        '\$${turnos.fold(0.0, (sum, turno) => sum + turno['precio']).toStringAsFixed(2)}'
                   },
                 ],
               ),
@@ -121,7 +177,8 @@ class MetricasScreen extends StatelessWidget {
             leading: Icon(icon),
             title: Text(
               title,
-              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
           ),
           ...metrics.map(
@@ -129,7 +186,8 @@ class MetricasScreen extends StatelessWidget {
               title: Text(metric['label']!),
               trailing: Text(
                 metric['value']!,
-                style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
             ),
           ),

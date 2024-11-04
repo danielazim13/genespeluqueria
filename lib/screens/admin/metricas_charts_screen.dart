@@ -55,7 +55,7 @@ class MetricasChartsScreen extends StatelessWidget {
             return AspectRatio(
               aspectRatio: 16 / 9,
               child: DChartBarCustom(
-                max: 80000,
+                max: 30,
                 showDomainLine: true,
                 showDomainLabel: true,
                 showMeasureLabel: true,

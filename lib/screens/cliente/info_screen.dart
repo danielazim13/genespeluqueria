@@ -52,7 +52,7 @@ class InfoScreen extends StatelessWidget {
           radius: 32.0,
         ),
         SizedBox(width: 16.0),
-        Column(
+        Expanded (child:         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
@@ -87,7 +87,7 @@ class InfoScreen extends StatelessWidget {
             ),
 
           ],
-        ),
+        ),),
       ],
     );
   }

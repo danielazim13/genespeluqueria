@@ -18,7 +18,7 @@ class Servicio {
     return Servicio(
         id: doc.id,
         nombre: data['nombre'] ?? '',
-        precio: data['precio'] ?? 0.0,
+        precio: (data['precio'] as num?)?.toDouble() ?? 0.0,
         duracion: data['duracion'] ?? 0);
   }
 

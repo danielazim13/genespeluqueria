@@ -198,10 +198,10 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
     return isServicioSelected && isDateSelected && isHourSelected;
   }
 
-  double _getSubtotal() {
-    return _selectedServicios.fold(
-        0.0, (total, service) => total + service.precio);
-  }
+double _getSubtotal() {
+  return _selectedServicios.fold(
+      0.0, (total, service) => total + (service.precio as num).toDouble());
+}
 
   double _getMinutes() {
     return _selectedServicios.fold(

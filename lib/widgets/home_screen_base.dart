@@ -37,7 +37,7 @@ class HomeScreenBase extends StatelessWidget {
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.home, size: 36),
+          Icon(Icons.home, size: 32),
           SizedBox(width: 8),
           Text(title),
         ],
@@ -46,7 +46,7 @@ class HomeScreenBase extends StatelessWidget {
       actions: [
         IconButton(
           icon: const Icon(Icons.account_circle),
-          iconSize: 36,
+          iconSize: 32,
           onPressed: () {
             context.push('/editar');
           },
@@ -57,7 +57,7 @@ class HomeScreenBase extends StatelessWidget {
         }),
         IconButton(
           icon: const Icon(Icons.logout),
-          iconSize: 36,
+          iconSize: 32,
           onPressed: () => _logout(context),
         )
         

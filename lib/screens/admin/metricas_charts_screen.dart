@@ -1,47 +1,80 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:d_chart/d_chart.dart';
 
-class MetricasChartsScreen extends StatelessWidget {
+class MetricasChartsScreen extends StatefulWidget {
   const MetricasChartsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    Future<List<DChartBarDataCustom>> fetchChartData() async {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('turns').get();
-      List<DChartBarDataCustom> data = [];
+  _MetricasChartsScreenState createState() => _MetricasChartsScreenState();
+}
 
-      List<String> estados = ['Pendiente','Realizado','Confirmado'];
-            List<int> estadosCont = [0,0,0];
-             
+class _MetricasChartsScreenState extends State<MetricasChartsScreen> {
+  DateTimeRange? _selectedDateRange;
 
-            for (var doc in snapshot.docs) {
+  Future<List<DChartBarDataCustom>> fetchChartData() async {
+    final snapshot = await FirebaseFirestore.instance.collection('turns').get();
+    List<DChartBarDataCustom> data = [];
 
-               if ( estados[0].contains(doc['estado'])){
-                  estadosCont[0]++;
-               } else if ( estados[1].contains(doc['estado'])){
-                  estadosCont[1]++;
-               } else if ( estados[2].contains(doc['estado'])){
-                  estadosCont[2]++;
-               }           
-            }
+    List<String> estados = ['Pendiente', 'Realizado', 'Confirmado'];
+    List<int> estadosCont = [0, 0, 0];
 
-          for (int i = 0; i < estados.length; i++) {
-               data.add(DChartBarDataCustom(
-                value: estadosCont[i].toDouble(), 
-                label: estados[i],    
-              ));
-            }
+    for (var doc in snapshot.docs) {
+      DateTime? ingreso = doc.data().containsKey('ingreso')
+          ? (doc['ingreso'] as Timestamp).toDate()
+          : null;
 
+      // Filtrar por rango de fechas si se especifica
+      if (_selectedDateRange != null && ingreso != null) {
+        if (ingreso.isBefore(_selectedDateRange!.start) ||
+            ingreso.isAfter(_selectedDateRange!.end)) {
+          continue;
+        }
+      }
 
-      return data;
+      if (estados[0].contains(doc['estado'])) {
+        estadosCont[0]++;
+      } else if (estados[1].contains(doc['estado'])) {
+        estadosCont[1]++;
+      } else if (estados[2].contains(doc['estado'])) {
+        estadosCont[2]++;
+      }
     }
 
+    for (int i = 0; i < estados.length; i++) {
+      data.add(DChartBarDataCustom(
+        value: estadosCont[i].toDouble(),
+        label: estados[i],
+      ));
+    }
+
+    return data;
+  }
+
+  void _pickDateRange() async {
+    DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(2023),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _selectedDateRange) {
+      setState(() {
+        _selectedDateRange = picked;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Métricas Chart"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.filter_list),
+            onPressed: _pickDateRange,
+          ),
+        ],
       ),
       body: FutureBuilder<List<DChartBarDataCustom>>(
         future: fetchChartData(),

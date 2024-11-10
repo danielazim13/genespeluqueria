@@ -44,6 +44,8 @@ class Turn {
     );
   }
 
+  get servicio => null;
+
   Map<String, dynamic> toFirestore() {
     return {
       'usuario': usuario.toMap(),

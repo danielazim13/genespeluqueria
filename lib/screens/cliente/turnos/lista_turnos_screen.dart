@@ -79,7 +79,7 @@ class _ListTurnView extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              'Turnos en Progreso',
+              'Turnos en progreso',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -114,12 +114,15 @@ class _TurnItem extends StatelessWidget {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ID: ${turn.id}'),
-            const SizedBox(height: 4),
             Text(
-              'Fecha: ${turn.ingreso.toString().split('.')[0]}',
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            )
+              'Fecha: ${turn.ingreso.toString().split(' ')[0]} ${turn.ingreso.toString().split(' ')[1].substring(0, 5)}',
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            const SizedBox(height: 4),
+            ...turn.servicios.map((servicio) => Text(
+              '${servicio.nombre}',
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            )),
           ],
         ),
         onTap: () {

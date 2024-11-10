@@ -8,7 +8,7 @@ class AdminHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return HomeScreenBase(
-      title: 'Home (Admin)',
+      title: 'Home',
       buttons: [
         NavigationButton(
           icon: Icons.calendar_month,

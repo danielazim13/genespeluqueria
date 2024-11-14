@@ -38,7 +38,7 @@ class MetricasChartsScreen extends StatelessWidget {
               ));
             }
         
-        print(snapshot.size);
+        //print(snapshot.size);
           
           rango = snapshot.size.toDouble();
       return data;

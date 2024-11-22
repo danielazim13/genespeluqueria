@@ -26,11 +26,6 @@ class AdminHomeScreen extends StatelessWidget {
           icon: Icons.bar_chart,
         ),
         NavigationButton(
-          text: 'Metricas Charts',
-          route: '/admin/metricas-charts',
-          icon: Icons.bar_chart,
-        ),
-        NavigationButton(
           icon: Icons.cut,
           text: 'Servicios',
           route: '/admin/servicios/lista',

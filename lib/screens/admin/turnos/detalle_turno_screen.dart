@@ -22,29 +22,31 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
     'Realizado',
     'Cancelado'
   ];
-  String? _turnService; //Cual servicio de los que ofrece la peluqueria quiere??
+  List<String> _turnServices = [];
   String? _userDetails;
+  String? _hourRange;
 
   @override
   void initState() {
     super.initState();
     _selectedState =
-        _states.contains(widget.turn.estado) ? widget.turn.estado: _states[0];
+        _states.contains(widget.turn.estado) ? widget.turn.estado : _states[0];
     _fetchTurnDetails();
     _fetchUserDetails();
   }
 
   Future<void> _fetchTurnDetails() async {
     try {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('turnos')
-          .doc(widget.turn.usuario.id)
-          .get();
-      if (snapshot.exists) {
-        setState(() {
-          _turnService = snapshot['servicio'] ?? 'Servicio no disponible';
-        });
-      }
+      // Fetch services directly from the turn object
+      setState(() {
+        _turnServices = widget.turn.servicios.map((s) => s.nombre).toList();
+
+        // Calculate hour range
+        DateTime startTime = widget.turn.ingreso;
+        //DateTime endTime = startTime.add(Duration(minutes: widget.turn.duracion));
+        _hourRange =
+            '${DateFormat('HH:mm').format(startTime)}'; // - ${DateFormat('HH:mm').format(endTime)}';
+      });
     } catch (e) {
       print('Error al obtener detalles del servicio: $e');
     }
@@ -71,7 +73,7 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
       await FirebaseFirestore.instance
           .collection('turns')
           .doc(widget.turn.id)
-          .update({'state': _selectedState});
+          .update({'estado': _selectedState});
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Estado actualizado con éxito')),
       );
@@ -110,7 +112,9 @@ class _TurnoDetailsScreenState extends State<TurnoDetailsScreen> {
                       DateFormat('dd/MM/yyyy').format(widget.turn.ingreso),
                     ),
                     const SizedBox(height: 10),
-                    _buildDetailRow('Nombre del servicio', _turnService),
+                    _buildDetailRow('Servicios', _turnServices.join(', ')),
+                    const SizedBox(height: 10),
+                    _buildDetailRow('Horario', _hourRange),
                     const SizedBox(height: 10),
                     _buildDetailRow('Usuario', _userDetails),
                     const SizedBox(height: 10),

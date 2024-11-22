@@ -21,13 +21,13 @@ class AdminHomeScreen extends StatelessWidget {
           icon: Icons.group,
         ),
         NavigationButton(
-          text: 'Metricas',
-          route: '/admin/metricas',
-          icon: Icons.bar_chart,
+          text: 'Peluqueros',
+          route: '/admin/config/peluqueros',
+          icon: Icons.content_cut,
         ),
         NavigationButton(
-          text: 'Metricas Charts',
-          route: '/admin/metricas-charts',
+          text: 'Metricas',
+          route: '/admin/metricas',
           icon: Icons.bar_chart,
         ),
         NavigationButton(

@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:d_chart/d_chart.dart';
 
-class MetricasScreen extends StatefulWidget {
-  const MetricasScreen({super.key});
+class MetricsScreen extends StatefulWidget {
+  const MetricsScreen({super.key});
 
   @override
-  _MetricasScreenState createState() => _MetricasScreenState();
+  _MetricsScreenState createState() => _MetricsScreenState();
 }
 
-class _MetricasScreenState extends State<MetricasScreen> {
+class _MetricsScreenState extends State<MetricsScreen> {
   DateTimeRange? _selectedDateRange;
 
-  Future<Map<String, dynamic>> obtenerDatos({DateTimeRange? dateRange}) async {
+  Future<Map<String, dynamic>> fetchData() async {
     try {
       QuerySnapshot turnosSnapshot =
           await FirebaseFirestore.instance.collection('turns').get();
@@ -41,9 +42,9 @@ class _MetricasScreenState extends State<MetricasScreen> {
                 : null;
 
             // Filtrar por rango de fechas si se especifica
-            if (dateRange != null && ingreso != null) {
-              if (ingreso.isBefore(dateRange.start) ||
-                  ingreso.isAfter(dateRange.end)) {
+            if (_selectedDateRange != null && ingreso != null) {
+              if (ingreso.isBefore(_selectedDateRange!.start) ||
+                  ingreso.isAfter(_selectedDateRange!.end)) {
                 return null;
               }
             }
@@ -60,14 +61,39 @@ class _MetricasScreenState extends State<MetricasScreen> {
           .cast<Map<String, dynamic>>()
           .toList();
 
+      // Preparar datos para el gráfico
+      List<DChartBarDataCustom> chartData = _prepareChartData(turnosMapeados);
+
       return {
         'turnos': turnosMapeados,
+        'chartData': chartData,
       };
     } catch (e) {
-      // Error handling
       print('Error al obtener los datos: $e');
       return {};
     }
+  }
+
+  List<DChartBarDataCustom> _prepareChartData(List<Map<String, dynamic>> turnos) {
+    List<String> estados = ['Pendiente','Confirmado', 'Realizado'];
+    List<int> estadosCont = [0, 0, 0];
+
+    for (var turno in turnos) {
+      if (turno['estado'] == estados[0]) {
+        estadosCont[0]++;
+      } else if (turno['estado'] == estados[1]) {
+        estadosCont[1]++;
+      } else if (turno['estado'] == estados[2]) {
+        estadosCont[2]++;
+      }
+    }
+
+    return List.generate(estados.length, (i) =>
+      DChartBarDataCustom(
+        value: estadosCont[i].toDouble(),
+        label: estados[i],
+      )
+    );
   }
 
   void _pickDateRange() async {
@@ -96,7 +122,7 @@ class _MetricasScreenState extends State<MetricasScreen> {
         ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
-        future: obtenerDatos(dateRange: _selectedDateRange),
+        future: fetchData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -109,10 +135,12 @@ class _MetricasScreenState extends State<MetricasScreen> {
           }
 
           List<Map<String, dynamic>> turnos = snapshot.data!['turnos'];
+          List<DChartBarDataCustom> chartData = snapshot.data!['chartData'];
 
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
+              // Existing metrics card
               _buildSection(
                 icon: Icons.event,
                 title: 'Turnos',
@@ -147,6 +175,7 @@ class _MetricasScreenState extends State<MetricasScreen> {
               const SizedBox(height: 20),
               const Divider(),
               const SizedBox(height: 20),
+              // Existing income section
               _buildSection(
                 icon: Icons.attach_money,
                 title: 'Ingresos',
@@ -157,6 +186,35 @@ class _MetricasScreenState extends State<MetricasScreen> {
                         '\$${turnos.fold(0.0, (sum, turno) => sum + turno['precio']).toStringAsFixed(2)}'
                   },
                 ],
+              ),
+              const SizedBox(height: 20),
+              const Divider(),
+              const SizedBox(height: 20),
+              // New chart section
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: SizedBox(
+                    height: 360,
+                    child: AspectRatio(
+                      aspectRatio: 16 / 9,
+                      child: DChartBarCustom(
+                        max: turnos.length.toDouble(),
+                        showDomainLine: true,
+                        showDomainLabel: true,
+                        showMeasureLabel: true,
+                        showMeasureLine: true,
+                        spaceDomainLinetoChart: 10,
+                        spaceMeasureLinetoChart: 10,
+                        radiusBar: const BorderRadius.only(
+                          topLeft: Radius.circular(9),
+                          topRight: Radius.circular(9),
+                        ),
+                        listData: chartData,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ],
           );
@@ -177,8 +235,7 @@ class _MetricasScreenState extends State<MetricasScreen> {
             leading: Icon(icon),
             title: Text(
               title,
-              style:
-                  const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
           ),
           ...metrics.map(

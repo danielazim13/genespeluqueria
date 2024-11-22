@@ -1,15 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class ChangeTheme with ChangeNotifier{
+class ChangeTheme with ChangeNotifier {
+  bool _isdarktheme = false;
 
-bool _isdarktheme = false;
+  bool get isdarktheme => _isdarktheme;
 
-bool get isdarktheme => _isdarktheme;
-
-void darktheme (){
-
-  _isdarktheme = !_isdarktheme;
-  notifyListeners();
-}
+  void darktheme() {
+    _isdarktheme = !_isdarktheme;
+    notifyListeners();
+  }
 }

@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 // entities
 import 'package:app/entities/usuario.dart';
-import 'package:app/entities/peluquero.dart';
 import 'package:app/entities/servicio.dart';
 import 'package:app/entities/turno.dart';
 
@@ -13,7 +12,6 @@ import 'package:app/entities/turno.dart';
 import 'package:app/widgets/spaced_column.dart';
 import 'package:app/widgets/agregar_turno/date_time_selector.dart';
 import 'package:app/widgets/agregar_turno/servicio_selector.dart';
-import 'package:app/widgets/agregar_turno/peluquero_selector.dart';
 import 'package:app/widgets/agregar_turno/message_form.dart';
 
 class SolicitarTurnoScreen extends StatefulWidget {
@@ -25,14 +23,12 @@ class SolicitarTurnoScreen extends StatefulWidget {
 
 class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   // State
-  Peluquero? _selectedPeluquero;
   DateTime? _selectedDate;
   String? _selectedHour;
   Set<Servicio> _selectedServicios = {};
   String? _message;
 
   // Data
-  List<Peluquero>? _peluqueros;
   List<Servicio>? _servicios;
 
   // Other
@@ -47,13 +43,11 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
   }
 
   Future<void> _loadInitialData() async {
-    final peluquerosFuture = PeluqueroSelector.loadPeluqueros();
     final servicesFuture = ServicioSelector.loadServicios();
-    final results = await Future.wait([peluquerosFuture, servicesFuture]);
+    final results = await Future.wait([servicesFuture]);
 
     setState(() {
-      _peluqueros = results[0] as List<Peluquero>;
-      _servicios = results[1] as List<Servicio>;
+      _servicios = results[0];
     });
   }
 
@@ -86,6 +80,7 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
       ingreso: ingreso,
       estado: 'Pendiente',
       precio: _getSubtotal(),
+      duracion: _getMinutes(),
       mensaje: _message ?? '',
     );
 
@@ -118,7 +113,6 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
       future: _initialLoadFuture,
       builder: (context, snapshot) {
         Widget bodyWidget;
-
         if (snapshot.connectionState == ConnectionState.waiting) {
           bodyWidget = const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
@@ -126,6 +120,7 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
         } else {
           bodyWidget = _buildMainContent();
         }
+        print(snapshot);
 
         return Scaffold(
           appBar: AppBar(title: const Text('Solicitar turno')),
@@ -146,10 +141,6 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
           servicios: _servicios!,
           onServiciosSelected: (x) => setState(() => _selectedServicios = x),
         ),
-        // PeluqueroSelector(
-        //   peluqueros: _peluqueros!,
-        //   onPeluqueroSelected: (x) => setState(() => _selectedPeluquero = x),
-        // ),
         MessageForm(
           onMessageChanged: (x) => setState(() => _message = x),
         ),
@@ -198,13 +189,13 @@ class _SolicitarTurnoScreenState extends State<SolicitarTurnoScreen> {
     return isServicioSelected && isDateSelected && isHourSelected;
   }
 
-double _getSubtotal() {
-  return _selectedServicios.fold(
-      0.0, (total, service) => total + (service.precio as num).toDouble());
-}
-
-  double _getMinutes() {
+  double _getSubtotal() {
     return _selectedServicios.fold(
-        0.0, (total, service) => total + service.duracion);
+        0.0, (total, service) => total + (service.precio as num).toDouble());
+  }
+
+  int _getMinutes() {
+    return _selectedServicios.fold(
+        0, (total, service) => total + service.duracion);
   }
 }

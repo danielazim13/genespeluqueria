@@ -10,6 +10,7 @@ class Turn {
   final DateTime ingreso;
   final String estado;
   final double precio;
+  final int duracion;
   final String mensaje;
 
   Turn({
@@ -19,6 +20,7 @@ class Turn {
     required this.ingreso,
     required this.estado,
     required this.precio,
+    required this.duracion,
     required this.mensaje,
   });
 
@@ -40,6 +42,7 @@ class Turn {
       ingreso: (data['ingreso'] as Timestamp?)?.toDate() ?? DateTime.now(),
       estado: data['estado'] ?? '',
       precio: (data['precio'] as num?)?.toDouble() ?? 0.0,
+      duracion: (data['duracion'] as num?)?.toInt() ?? 0,
       mensaje: data['mensaje'] as String? ?? '',
     );
   }
@@ -53,6 +56,7 @@ class Turn {
       'ingreso': ingreso,
       'estado': estado,
       'precio': precio,
+      'duracion': duracion,
       'mensaje': mensaje,
     };
   }

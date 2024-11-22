@@ -1,5 +1,5 @@
 import 'package:app/entities/usuario.dart';
-import 'package:app/screens/admin/metricas_charts_screen.dart';
+import 'package:app/screens/admin/config/peluqueros_screen.dart';
 import 'package:app/screens/admin/metricas_screen.dart';
 import 'package:app/screens/admin/usuarios/detalle_usuario_screen.dart';
 import 'package:app/screens/admin/usuarios/lista_usuarios_screen.dart';
@@ -117,16 +117,16 @@ final adminRoutes = [
   // Metricas
   GoRoute(
     path: '/admin/metricas',
-    builder: (context, state) => const MetricasScreen(),
-  ),
-  GoRoute(
-    path: '/admin/metricas-charts',
-    builder: (context, state) => const MetricasChartsScreen(),
+    builder: (context, state) => const MetricsScreen(),
   ),
   // Config
   GoRoute(
     path: '/admin/config/business-hours',
     builder: (context, state) => const BusinessHoursScreen(),
+  ),
+  GoRoute(
+    path: '/admin/config/peluqueros',
+    builder: (context, state) => const PeluquerosConfigScreen(),
   ),
   // Servicios (ABM)
   GoRoute(

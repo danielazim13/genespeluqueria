@@ -39,54 +39,66 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
     _fetchBusinessHours();
   }
 
-Future<void> _fetchBusinessHours() async {
-  try {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('configuration')
-        .doc('businessHours')
-        .get();
+  Future<void> _fetchBusinessHours() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('configuration')
+          .doc('businessHours')
+          .get();
 
-    if (snapshot.exists) {
-      setState(() {
-        businessHours = snapshot.data() as Map<String, dynamic>?;
-      });
-    } else {
-      await _createDefaultBusinessHours();
-      setState(() {
-        businessHours = {
-          'Monday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-          'Tuesday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-          'Wednesday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-          'Thursday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-          'Friday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-          'Saturday': {'open': false, 'openTime': null, 'closeTime': null},
-          'Sunday': {'open': false, 'openTime': null, 'closeTime': null},
-        };
-      });
+      if (snapshot.exists) {
+        setState(() {
+          businessHours = snapshot.data() as Map<String, dynamic>?;
+        });
+      } else {
+        await _createDefaultBusinessHours();
+        setState(() {
+          businessHours = {
+            'Monday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
+            'Tuesday': {
+              'open': true,
+              'openTime': '08:00',
+              'closeTime': '18:00'
+            },
+            'Wednesday': {
+              'open': true,
+              'openTime': '08:00',
+              'closeTime': '18:00'
+            },
+            'Thursday': {
+              'open': true,
+              'openTime': '08:00',
+              'closeTime': '18:00'
+            },
+            'Friday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
+            'Saturday': {'open': false, 'openTime': null, 'closeTime': null},
+            'Sunday': {'open': false, 'openTime': null, 'closeTime': null},
+          };
+        });
+      }
+    } catch (e) {
+      print("Error fetching business hours: $e");
     }
-  } catch (e) {
-    print("Error fetching business hours: $e");
   }
-}
 
-Future<void> _createDefaultBusinessHours() async {
-  try {
-    await FirebaseFirestore.instance
-        .collection('configuration')
-        .doc('businessHours')
-        .set({
-      'Monday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-      'Tuesday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-      'Wednesday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-      'Thursday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-      'Friday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
-      'Saturday': {'open': false, 'openTime': null, 'closeTime': null},
-      'Sunday': {'open': false, 'openTime': null, 'closeTime': null},
-    });
-  } catch (e) {
-    print("Error creating default business hours: $e");
+  Future<void> _createDefaultBusinessHours() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('configuration')
+          .doc('businessHours')
+          .set({
+        'Monday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
+        'Tuesday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
+        'Wednesday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
+        'Thursday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
+        'Friday': {'open': true, 'openTime': '08:00', 'closeTime': '18:00'},
+        'Saturday': {'open': false, 'openTime': null, 'closeTime': null},
+        'Sunday': {'open': false, 'openTime': null, 'closeTime': null},
+      });
+    } catch (e) {
+      print("Error creating default business hours: $e");
+    }
   }
-}
 
   Future<List<String>> _fetchReservedTimes(DateTime date) async {
     try {
@@ -133,13 +145,55 @@ Future<void> _createDefaultBusinessHours() async {
     TimeOfDay open = _timeOfDayFromString(openTime);
     TimeOfDay close = _timeOfDayFromString(closeTime);
 
+    // Create a list of time slots in 30-minute intervals
     final List<String> allTimes = [];
-    for (int hour = open.hour; hour < close.hour; hour++) {
-      allTimes.add('${hour.toString().padLeft(2, '0')}:00');
+    DateTime current =
+        DateTime(date.year, date.month, date.day, open.hour, open.minute);
+    DateTime end =
+        DateTime(date.year, date.month, date.day, close.hour, close.minute);
+    while (current.isBefore(end)) {
+      allTimes.add(DateFormat('HH:mm').format(current));
+      current = current.add(const Duration(minutes: 30));
     }
 
-    final reservedTimes = await _fetchReservedTimes(date);
-    return allTimes.where((time) => !reservedTimes.contains(time)).toList();
+    // Fetch reserved times with durations
+    final reservedTurnsSnapshot = await FirebaseFirestore.instance
+        .collection('turns')
+        .where('ingreso', isGreaterThanOrEqualTo: date)
+        .where('ingreso', isLessThan: date.add(const Duration(days: 1)))
+        .get();
+
+    final reservedIntervals = reservedTurnsSnapshot.docs
+        .map((doc) {
+          final data = doc.data();
+          if (data.containsKey('ingreso') &&
+              data['ingreso'] is Timestamp &&
+              data.containsKey('duracion')) {
+            final Timestamp timestamp = data['ingreso'];
+            final int duration = data['duracion'] ?? 0; // Duration in minutes
+            final DateTime startTime = timestamp.toDate();
+            final DateTime endTime = startTime.add(Duration(minutes: duration));
+            return {'start': startTime, 'end': endTime};
+          }
+          return null;
+        })
+        .where((interval) => interval != null)
+        .toList();
+
+    // Filter out unavailable times
+    final availableTimes = allTimes.where((slot) {
+      final slotTime = DateFormat('HH:mm').parse(slot);
+      final slotStart = DateTime(
+          date.year, date.month, date.day, slotTime.hour, slotTime.minute);
+      final slotEnd = slotStart.add(const Duration(minutes: 30));
+      return !reservedIntervals.any((interval) {
+        final start = interval!['start'] as DateTime;
+        final end = interval['end'] as DateTime;
+        return slotStart.isBefore(end) && slotEnd.isAfter(start);
+      });
+    }).toList();
+
+    return availableTimes;
   }
 
   TimeOfDay _timeOfDayFromString(String time) {
@@ -281,7 +335,8 @@ Future<void> _createDefaultBusinessHours() async {
         String openTime = businessHours![day]['openTime'] ?? '';
         String closeTime = businessHours![day]['closeTime'] ?? '';
 
-        String translatedDay = _daysTranslation[day] ?? day; // Traduce el día al español
+        String translatedDay =
+            _daysTranslation[day] ?? day; // Traduce el día al español
 
         String hoursText = isOpen ? '$openTime - $closeTime' : 'CERRADO';
 

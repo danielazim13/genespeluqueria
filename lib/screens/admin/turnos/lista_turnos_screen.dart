@@ -5,7 +5,7 @@ import 'package:app/widgets/turn_item.dart';
 import 'package:intl/intl.dart';
 
 class TurnosListScreen extends StatefulWidget {
-  const TurnosListScreen({Key? key}) : super(key: key);
+  const TurnosListScreen({super.key});
   @override
   _TurnosListScreenState createState() => _TurnosListScreenState();
 }

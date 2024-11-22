@@ -7,7 +7,7 @@ import 'package:app/entities/servicio.dart';
 class DetalleServicioScreen extends StatefulWidget {
   final Servicio servicio;
 
-  const DetalleServicioScreen({required this.servicio});
+  const DetalleServicioScreen({super.key, required this.servicio});
 
   @override
   _DetalleServicioScreenState createState() => _DetalleServicioScreenState();

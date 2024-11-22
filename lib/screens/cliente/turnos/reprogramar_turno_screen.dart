@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 class ReprogramarTurnoScreen extends StatefulWidget {
   final String turnoId;
 
-  const ReprogramarTurnoScreen ({Key? key, required this.turnoId}): super(key:key);
+  const ReprogramarTurnoScreen ({super.key, required this.turnoId});
 
   @override
   _ReprogramarTurnoScreenState createState() => _ReprogramarTurnoScreenState();
@@ -89,7 +89,7 @@ class _ReprogramarTurnoScreenState extends State<ReprogramarTurnoScreen> {
               child: const Text('OK'),
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).pop(); 
+                Navigator.of(context).pop();
               },
             ),
           ],

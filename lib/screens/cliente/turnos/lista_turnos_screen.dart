@@ -83,7 +83,7 @@ class _ListTurnView extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-          ...inProgressTurns.map((turn) => _TurnItem(turn: turn)).toList(),
+          ...inProgressTurns.map((turn) => _TurnItem(turn: turn)),
           const Divider(),
         ],
         if (doneTurns.isNotEmpty) ...[
@@ -94,7 +94,7 @@ class _ListTurnView extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
-          ...doneTurns.map((turn) => _TurnItem(turn: turn)).toList(),
+          ...doneTurns.map((turn) => _TurnItem(turn: turn)),
           const Divider(),
         ],
       ],
@@ -120,7 +120,7 @@ class _TurnItem extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             ...turn.servicios.map((servicio) => Text(
-              '${servicio.nombre}',
+              servicio.nombre,
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             )),
           ],

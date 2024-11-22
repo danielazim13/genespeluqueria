@@ -145,6 +145,21 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
     TimeOfDay open = _timeOfDayFromString(openTime);
     TimeOfDay close = _timeOfDayFromString(closeTime);
 
+    // Fetch the peluqueros' cantidad
+    int cantidad = 1; // Default to 1 if not available
+    try {
+      final peluquerosDoc = await FirebaseFirestore.instance
+          .collection('configuration')
+          .doc('peluqueros')
+          .get();
+      if (peluquerosDoc.exists &&
+          peluquerosDoc.data()!.containsKey('cantidad')) {
+        cantidad = peluquerosDoc.data()!['cantidad'] as int;
+      }
+    } catch (e) {
+      print("Error fetching peluqueros cantidad: $e");
+    }
+
     // Create a list of time slots in 30-minute intervals
     final List<String> allTimes = [];
     DateTime current =
@@ -163,34 +178,35 @@ class _DateTimeSelectorState extends State<DateTimeSelector> {
         .where('ingreso', isLessThan: date.add(const Duration(days: 1)))
         .get();
 
-    final reservedIntervals = reservedTurnsSnapshot.docs
-        .map((doc) {
-          final data = doc.data();
-          if (data.containsKey('ingreso') &&
-              data['ingreso'] is Timestamp &&
-              data.containsKey('duracion')) {
-            final Timestamp timestamp = data['ingreso'];
-            final int duration = data['duracion'] ?? 0; // Duration in minutes
-            final DateTime startTime = timestamp.toDate();
-            final DateTime endTime = startTime.add(Duration(minutes: duration));
-            return {'start': startTime, 'end': endTime};
-          }
-          return null;
-        })
-        .where((interval) => interval != null)
-        .toList();
+    // Map to store the count of active turns at each time slot
+    final Map<String, int> slotOccupancy = {for (var slot in allTimes) slot: 0};
 
-    // Filter out unavailable times
+    for (var doc in reservedTurnsSnapshot.docs) {
+      final data = doc.data();
+      if (data.containsKey('ingreso') &&
+          data['ingreso'] is Timestamp &&
+          data.containsKey('duracion')) {
+        final Timestamp timestamp = data['ingreso'];
+        final int duration = data['duracion'] ?? 0;
+        final DateTime startTime = timestamp.toDate();
+        final DateTime endTime = startTime.add(Duration(minutes: duration));
+
+        for (var slot in allTimes) {
+          final slotTime = DateFormat('HH:mm').parse(slot);
+          final slotStart = DateTime(
+              date.year, date.month, date.day, slotTime.hour, slotTime.minute);
+          final slotEnd = slotStart.add(const Duration(minutes: 30));
+
+          if (slotStart.isBefore(endTime) && slotEnd.isAfter(startTime)) {
+            slotOccupancy[slot] = (slotOccupancy[slot] ?? 0) + 1;
+          }
+        }
+      }
+    }
+
+    // Filter slots based on peluqueros' availability
     final availableTimes = allTimes.where((slot) {
-      final slotTime = DateFormat('HH:mm').parse(slot);
-      final slotStart = DateTime(
-          date.year, date.month, date.day, slotTime.hour, slotTime.minute);
-      final slotEnd = slotStart.add(const Duration(minutes: 30));
-      return !reservedIntervals.any((interval) {
-        final start = interval!['start'] as DateTime;
-        final end = interval['end'] as DateTime;
-        return slotStart.isBefore(end) && slotEnd.isAfter(start);
-      });
+      return (slotOccupancy[slot] ?? 0) < cantidad;
     }).toList();
 
     return availableTimes;

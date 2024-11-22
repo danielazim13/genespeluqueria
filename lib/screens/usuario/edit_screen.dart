@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 
 class EditUserScreen extends StatefulWidget {
   const EditUserScreen({super.key});
@@ -32,11 +33,11 @@ class _EditUserScreenState extends State<EditUserScreen> {
       }
 
       DocumentSnapshot userDoc =
-          await _firestore.collection('users').doc(_userId).get();
+          await _firestore.collection('usuarios').doc(_userId).get();
       if (userDoc.exists) {
         setState(() {
-          _nameController.text = userDoc['name'] ?? '';
-          _phoneController.text = userDoc['phone'] ?? '';
+          _nameController.text = userDoc['nombre'] ?? '';
+          _phoneController.text = userDoc['telefono'] ?? '';
         });
       } else {
         print('El documento del usuario no existe');
@@ -55,13 +56,14 @@ class _EditUserScreenState extends State<EditUserScreen> {
 
     if (_formKey.currentState!.validate()) {
       try {
-        await _firestore.collection('users').doc(_userId).update({
-          'name': _nameController.text,
-          'phone': _phoneController.text,
+        await _firestore.collection('usuarios').doc(_userId).update({
+          'nombre': _nameController.text,
+          'telefono': _phoneController.text,
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Usuario actualizado exitosamente')),
         );
+        context.pop();
       } catch (e) {
         print('Error al actualizar el usuario: $e');
         ScaffoldMessenger.of(context).showSnackBar(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:app/widgets/menu_item.dart';
-import 'package:app/Global/globals.dart' as globals;
-
+import 'package:app/providers/change_theme_provider.dart';
 
 class HomeScreenBase extends StatelessWidget {
   final String title;
@@ -18,22 +18,20 @@ class HomeScreenBase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: _buildAppBar(context),
-        body: SingleChildScrollView(
-          child: Column(
-            children: buttons.map((button) {
-              return button;
-            }).toList(),
-          ),
+      appBar: _buildAppBar(context),
+      body: SingleChildScrollView(
+        child: Column(
+          children: buttons.map((button) {
+            return button;
+          }).toList(),
         ),
-      );
-
+      ),
+    );
   }
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       automaticallyImplyLeading: true,
-      // izquierda
       title: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -42,7 +40,6 @@ class HomeScreenBase extends StatelessWidget {
           Text(title),
         ],
       ),
-      // derecha
       actions: [
         IconButton(
           icon: const Icon(Icons.account_circle),
@@ -51,24 +48,32 @@ class HomeScreenBase extends StatelessWidget {
             context.push('/editar');
           },
         ),
-        Switch(value: globals.changeTheme.isdarktheme, onChanged: (_) {
-
-          globals.changeTheme.darktheme();
-        }),
+        Consumer<ChangeTheme>(
+          builder: (context, themeProvider, child) {
+            return IconButton(
+              icon: Icon(
+                themeProvider.isdarktheme
+                  ? Icons.light_mode_outlined
+                  : Icons.dark_mode_outlined,
+                size: 32,
+              ),
+              onPressed: () {
+                themeProvider.darktheme();
+              },
+            );
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.logout),
           iconSize: 32,
           onPressed: () => _logout(context),
         )
-        
-
       ],
     );
   }
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
-    // ignore: use_build_context_synchronously
     context.go('/');
   }
 }

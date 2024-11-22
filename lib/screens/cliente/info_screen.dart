@@ -19,7 +19,7 @@ class InfoScreen extends StatelessWidget {
             _buildProfileHeader(),
             SizedBox(height: 16.0),
             _buildInfoTile(
-              icon: FontAwesomeIcons.mapMarkerAlt,
+              icon: FontAwesomeIcons.locationDot,
               title: 'Location',
               content: 'Güemes 4507\nPalermo',
               onTap: () => _launchUrl(
@@ -54,42 +54,43 @@ class InfoScreen extends StatelessWidget {
           radius: 32.0,
         ),
         SizedBox(width: 16.0),
-        Expanded (child:         Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Genes peluqueria',
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Genes peluqueria',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 4.0),
-            Text(
-              '✨Salón de Belleza 💇‍♀️💅',
-              style: TextStyle(
-                fontSize: 14.0,
-                color: Colors.grey[600],
+              SizedBox(height: 4.0),
+              Text(
+                '✨Salón de Belleza 💇‍♀️💅',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.grey[600],
+                ),
               ),
-            ),
-            Text(
-              '⚡️𝐄𝐱𝐩𝐞𝐫𝐭𝐚 𝐞𝐧 𝐞𝐥 𝐜𝐮𝐢𝐝𝐚𝐝𝐨 𝐝𝐞 𝐭𝐮 𝐜𝐚𝐛𝐞𝐥𝐥𝐨💯',
-              style: TextStyle(
-                fontSize: 14.0,
-                color: Colors.grey[600],
+              Text(
+                '⚡️𝐄𝐱𝐩𝐞𝐫𝐭𝐚 𝐞𝐧 𝐞𝐥 𝐜𝐮𝐢𝐝𝐚𝐝𝐨 𝐝𝐞 𝐭𝐮 𝐜𝐚𝐛𝐞𝐥𝐥𝐨💯',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.grey[600],
+                ),
               ),
-            ),
-            SizedBox(height: 4.0),
-            Text(
-              '⌚️ Martes a sábados 10hs-19hs',
-              style: TextStyle(
-                fontSize: 14.0,
-                color: Colors.grey[600],
+              SizedBox(height: 4.0),
+              Text(
+                '⌚️ Martes a sábados 10hs-19hs',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  color: Colors.grey[600],
+                ),
               ),
-            ),
-
-          ],
-        ),),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -134,10 +135,11 @@ class InfoScreen extends StatelessWidget {
   }
 
   void _launchUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
+    final Uri parsed = Uri.parse(url);
+    if (await canLaunchUrl(parsed)) {
+      await launchUrl(parsed);
     } else {
-      throw 'Could not launch $url';
+      throw 'Could not launch $parsed';
     }
   }
 }
